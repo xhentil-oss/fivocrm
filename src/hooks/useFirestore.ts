@@ -127,6 +127,13 @@ export function useDocument<T = DocumentData>(
   return { data, loading, error };
 }
 
+// Helper to remove undefined values (Firebase doesn't accept undefined)
+function removeUndefined(obj: Record<string, any>): Record<string, any> {
+  return Object.fromEntries(
+    Object.entries(obj).filter(([_, value]) => value !== undefined)
+  );
+}
+
 // Hook for mutations (create, update, delete)
 export function useMutation<T = DocumentData>(collectionName: string) {
   const { user } = useAuth();
@@ -137,12 +144,12 @@ export function useMutation<T = DocumentData>(collectionName: string) {
     setLoading(true);
     setError(null);
     try {
-      const docData = {
+      const docData = removeUndefined({
         ...data,
         createdAt: Timestamp.now(),
         updatedAt: Timestamp.now(),
         createdByUserId: user?.uid || null
-      };
+      });
       const docRef = await addDoc(collection(db, collectionName), docData);
       setLoading(false);
       return { id: docRef.id, ...docData };
@@ -158,10 +165,10 @@ export function useMutation<T = DocumentData>(collectionName: string) {
     setError(null);
     try {
       const docRef = doc(db, collectionName, id);
-      await updateDoc(docRef, {
+      await updateDoc(docRef, removeUndefined({
         ...data,
         updatedAt: Timestamp.now()
-      } as any);
+      }) as any);
       setLoading(false);
     } catch (err) {
       setError(err as Error);
