@@ -21,13 +21,13 @@ const CRMView: React.FC = () => {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('all');
 
-  const { user } = useAuth({ requireAuth: true });
-  const { data: leads, isPending: leadsLoading } = useQuery('Lead', {
-    orderBy: { createdAt: 'desc' }
+  const { user } = useAuth();
+  const { data: leads, loading: leadsLoading } = useCollection<Lead>('leads', {
+    orderBy: { field: 'createdAt', direction: 'desc' }
   });
-  const leadMutation = useMutation('Lead');
-  const customerMutation = useMutation('Customer');
-  const notificationMutation = useMutation('Notification');
+  const leadMutation = useMutation<Lead>('leads');
+  const customerMutation = useMutation<Customer>('customers');
+  const notificationMutation = useMutation<Notification>('notifications');
 
   const getStatusColor = (status: string) => {
     switch (status) {

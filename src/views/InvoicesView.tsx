@@ -391,10 +391,10 @@ const InvoiceForm: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const [lineItems, setLineItems] = useState<Array<{ serviceId: string; quantity: number }>>([]);
   const [tax, setTax] = useState<number>(0);
 
-  const { data: customers } = useQuery('Customer');
-  const { data: services } = useQuery('Service');
-  const invoiceMutation = useMutation('Invoice');
-  const invoiceItemMutation = useMutation('InvoiceItem');
+  const { data: customers } = useCollection<Customer>('customers');
+  const { data: services } = useCollection<Service>('services');
+  const invoiceMutation = useMutation<Invoice>('invoices');
+  const invoiceItemMutation = useMutation<InvoiceItem>('invoiceItems');
 
   const addLineItem = () => {
     setLineItems([...lineItems, { serviceId: '', quantity: 1 }]);
@@ -632,28 +632,17 @@ const InvoiceForm: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 };
 
 const InvoiceDetails: React.FC<{ invoice: Invoice }> = ({ invoice }) => {
-  const { data: customer } = useQuery('Customer', invoice.customerId);
-  const { data: invoiceItems } = useQuery('InvoiceItem', {
-    where: { invoiceId: invoice.id }
+  const { data: allCustomers } = useCollection<Customer>('customers');
+  const customer = allCustomers?.find(c => c.id === invoice.customerId);
+  const { data: invoiceItems } = useCollection<InvoiceItem>('invoiceItems', {
+    where: [{ field: 'invoiceId', operator: '==', value: invoice.id }]
   });
-  const { query: queryService } = useLazyQuery('Service');
+  const { data: allServices } = useCollection<Service>('services');
 
-  const [services, setServices] = React.useState<Record<string, any>>({});
-
-  React.useEffect(() => {
-    const loadServices = async () => {
-      if (!invoiceItems) return;
-      const serviceMap: Record<string, any> = {};
-      for (const item of invoiceItems) {
-        if (!serviceMap[item.serviceId]) {
-          const service = await queryService(item.serviceId);
-          serviceMap[item.serviceId] = service;
-        }
-      }
-      setServices(serviceMap);
-    };
-    loadServices();
-  }, [invoiceItems]);
+  const services = React.useMemo(() => {
+    if (!allServices) return {};
+    return allServices.reduce((acc, s) => ({ ...acc, [s.id]: s }), {} as Record<string, Service>);
+  }, [allServices]);
 
   return (
     <div className="space-y-6">

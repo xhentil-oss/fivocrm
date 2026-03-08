@@ -33,13 +33,13 @@ const TimeTrackingView: React.FC = () => {
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const timerIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  const { data: timeEntries, isPending: entriesLoading } = useQuery('TimeEntry', {
-    where: { userId: user?.id },
-    orderBy: { startTime: 'desc' }
+  const { data: timeEntries, loading: entriesLoading } = useCollection<TimeEntry>('timeEntries', {
+    where: user ? [{ field: 'userId', operator: '==', value: user.uid }] : undefined,
+    orderBy: { field: 'startTime', direction: 'desc' }
   });
-  const { data: tasks } = useQuery('Task');
-  const { data: projects } = useQuery('Project');
-  const timeEntryMutation = useMutation('TimeEntry');
+  const { data: tasks } = useCollection<Task>('tasks');
+  const { data: projects } = useCollection<Project>('projects');
+  const timeEntryMutation = useMutation<TimeEntry>('timeEntries');
 
   // Find running entry on mount
   useEffect(() => {

@@ -17,10 +17,10 @@ const ServicesView: React.FC = () => {
   const [selectedService, setSelectedService] = useState<Service | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
-  const { data: services, isPending: servicesLoading } = useQuery('Service', {
-    orderBy: { createdAt: 'desc' }
+  const { data: services, loading: servicesLoading } = useCollection<Service>('services', {
+    orderBy: { field: 'createdAt', direction: 'desc' }
   });
-  const serviceMutation = useMutation('Service');
+  const serviceMutation = useMutation<Service>('services');
 
   const handleCreateService = async (formData: FormData) => {
     const title = formData.get('title') as string;

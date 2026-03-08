@@ -24,15 +24,15 @@ export type UserPermissions = {
 };
 
 export function usePermissions(): UserPermissions {
-  const { user, isPending: userLoading } = useAuth();
+  const { user, loading: userLoading } = useAuth();
   
   // Query ALL team members first, then filter client-side
   // This is because userId might be stored as email or actual user ID
-  const { data: allTeamMembers, isPending: membersLoading } = useQuery('TeamMember', {
-    where: { status: 'Active' }
+  const { data: allTeamMembers, loading: membersLoading } = useCollection<any>('teamMembers', {
+    where: [{ field: 'status', operator: '==', value: 'Active' }]
   });
 
-  const { data: teams } = useQuery('Team');
+  const { data: teams } = useCollection<any>('teams');
 
   // Filter team members for current user (check both user.id and user.email)
   const teamMembers = useMemo(() => {

@@ -22,15 +22,15 @@ const GoalsView: React.FC = () => {
   const [filterStatus, setFilterStatus] = useState<string>('all');
 
   // Fetch data
-  const { data: allGoals, isPending: goalsLoading } = useQuery('Goal', {
-    orderBy: { dueDate: 'asc' }
+  const { data: allGoals, loading: goalsLoading } = useCollection<Goal>('goals', {
+    orderBy: { field: 'dueDate', direction: 'asc' }
   });
-  const { data: teams } = useQuery('Team');
-  const { data: milestones } = useQuery('Milestone');
+  const { data: teams } = useCollection<Team>('teams');
+  const { data: milestones } = useCollection<Milestone>('milestones');
 
   // Mutations
-  const goalMutation = useMutation('Goal');
-  const milestoneMutation = useMutation('Milestone');
+  const goalMutation = useMutation<Goal>('goals');
+  const milestoneMutation = useMutation<Milestone>('milestones');
 
   // Filter goals
   const goals = React.useMemo(() => {

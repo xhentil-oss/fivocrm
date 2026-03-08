@@ -46,10 +46,10 @@ const CustomersView: React.FC = () => {
   const [creditLimitFilter, setCreditLimitFilter] = useState<string>('__all__');
   const [showFilters, setShowFilters] = useState(false);
 
-  const { data: customers, isPending: customersLoading } = useQuery('Customer', {
-    orderBy: { createdAt: 'desc' }
+  const { data: customers, loading: customersLoading } = useCollection<Customer>('customers', {
+    orderBy: { field: 'createdAt', direction: 'desc' }
   });
-  const customerMutation = useMutation('Customer');
+  const customerMutation = useMutation<Customer>('customers');
 
   // Filter customers based on search and filters
   const filteredCustomers = useMemo(() => {

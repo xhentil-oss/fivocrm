@@ -69,39 +69,39 @@ const TaskDetailDialog: React.FC<TaskDetailDialogProps> = ({
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const timerIntervalRef = useRef<NodeJS.Timeout | null>(null);
   
-  const { data: subtasks } = useQuery('Task', {
-    where: { parentTaskId: task.id }
+  const { data: subtasks } = useCollection<Task>('tasks', {
+    where: [{ field: 'parentTaskId', operator: '==', value: task.id }]
   });
   
-  const { data: taskCollaborators } = useQuery('TaskCollaborator', {
-    where: { taskId: task.id }
+  const { data: taskCollaborators } = useCollection<any>('taskCollaborators', {
+    where: [{ field: 'taskId', operator: '==', value: task.id }]
   });
 
-  const { data: timeEntries } = useQuery('TimeEntry', {
-    where: { taskId: task.id },
-    orderBy: { startTime: 'desc' }
+  const { data: timeEntries } = useCollection<any>('timeEntries', {
+    where: [{ field: 'taskId', operator: '==', value: task.id }],
+    orderBy: { field: 'startTime', direction: 'desc' }
   });
 
   // Fetch chat messages for this task
-  const { data: taskMessages, isPending: isLoadingMessages } = useQuery('Message', {
-    where: { taskId: task.id },
-    orderBy: { createdAt: 'asc' }
+  const { data: taskMessages, loading: isLoadingMessages } = useCollection<any>('messages', {
+    where: [{ field: 'taskId', operator: '==', value: task.id }],
+    orderBy: { field: 'createdAt', direction: 'asc' }
   });
 
   // Get all active time entries to show who's working on what
-  const { data: allActiveTimeEntries } = useQuery('TimeEntry', {
-    where: { endTime: undefined }
+  const { data: allActiveTimeEntries } = useCollection<any>('timeEntries', {
+    where: [{ field: 'endTime', operator: '==', value: null }]
   });
 
   // Get team members for @mentions
-  const { data: teamMembers } = useQuery('TeamMember', {
-    where: { status: 'Active' }
+  const { data: teamMembers } = useCollection<any>('teamMembers', {
+    where: [{ field: 'status', operator: '==', value: 'Active' }]
   });
 
-  const taskMutation = useMutation('Task');
-  const timeEntryMutation = useMutation('TimeEntry');
-  const notificationMutation = useMutation('Notification');
-  const messageMutation = useMutation('Message');
+  const taskMutation = useMutation<Task>('tasks');
+  const timeEntryMutation = useMutation<any>('timeEntries');
+  const notificationMutation = useMutation<any>('notifications');
+  const messageMutation = useMutation<any>('messages');
 
   // Parse attachments from JSON
   const attachments = React.useMemo(() => {

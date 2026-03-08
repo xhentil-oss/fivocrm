@@ -84,31 +84,31 @@ const UserProfileView: React.FC<UserProfileViewProps> = ({ userId }) => {
   } : currentUser;
 
   // Fetch user profile
-  const { data: profiles } = useQuery('UserProfile', {
-    where: { userId: targetUserId }
+  const { data: profiles } = useCollection<UserProfile>('userProfiles', {
+    where: [{ field: 'userId', operator: '==', value: targetUserId }]
   });
   const profile = profiles?.[0];
 
   // Fetch user's tasks, projects, and goals
-  const { data: userTasks } = useQuery('Task', {
-    where: { assignedToUserId: targetUserId },
-    orderBy: { createdAt: 'desc' }
+  const { data: userTasks } = useCollection<Task>('tasks', {
+    where: [{ field: 'assignedToUserId', operator: '==', value: targetUserId }],
+    orderBy: { field: 'createdAt', direction: 'desc' }
   });
 
-  const { data: allProjects } = useQuery('Project');
+  const { data: allProjects } = useCollection<Project>('projects');
   const userProjects = React.useMemo(() => {
     if (!allProjects || !userTasks) return [];
     const projectIds = new Set(userTasks.map(t => t.projectId).filter(Boolean));
     return allProjects.filter(p => projectIds.has(p.id));
   }, [allProjects, userTasks]);
 
-  const { data: userGoals } = useQuery('Goal', {
-    where: { ownerId: targetUserId },
-    orderBy: { dueDate: 'asc' }
+  const { data: userGoals } = useCollection<Goal>('goals', {
+    where: [{ field: 'ownerId', operator: '==', value: targetUserId }],
+    orderBy: { field: 'dueDate', direction: 'asc' }
   });
 
   // Mutations
-  const profileMutation = useMutation('UserProfile');
+  const profileMutation = useMutation<UserProfile>('userProfiles');
 
   // Initialize skills from profile
   useEffect(() => {

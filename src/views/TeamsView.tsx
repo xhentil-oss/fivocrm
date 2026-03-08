@@ -35,15 +35,15 @@ const TeamsView: React.FC = () => {
   const [editingMember, setEditingMember] = useState<TeamMember | null>(null);
   const [isEditMemberDialogOpen, setIsEditMemberDialogOpen] = useState(false);
 
-  const { data: teams, isPending: teamsLoading } = useQuery('Team', {
-    orderBy: { createdAt: 'desc' }
+  const { data: teams, loading: teamsLoading } = useCollection<Team>('teams', {
+    orderBy: { field: 'createdAt', direction: 'desc' }
   });
-  const { data: teamMembers } = useQuery('TeamMember');
-  const { data: teamInvites } = useQuery('TeamInvite');
+  const { data: teamMembers } = useCollection<TeamMember>('teamMembers');
+  const { data: teamInvites } = useCollection<TeamInvite>('teamInvites');
   
-  const teamMutation = useMutation('Team');
-  const memberMutation = useMutation('TeamMember');
-  const inviteMutation = useMutation('TeamInvite');
+  const teamMutation = useMutation<Team>('teams');
+  const memberMutation = useMutation<TeamMember>('teamMembers');
+  const inviteMutation = useMutation<TeamInvite>('teamInvites');
 
   const handleCreateTeam = async (formData: FormData) => {
     const name = formData.get('name') as string;

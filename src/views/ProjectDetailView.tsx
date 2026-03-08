@@ -36,21 +36,22 @@ const ProjectDetailView: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
 
   // Fetch project data
-  const { data: project, isPending: projectLoading } = useQuery('Project', projectId || '');
-  const { data: allTasks } = useQuery('Task', {
-    where: { projectId },
-    orderBy: { createdAt: 'desc' }
+  const { data: projectData, loading: projectLoading } = useDocument<Project>('projects', projectId || '');
+  const project = projectData;
+  const { data: allTasks } = useCollection<Task>('tasks', {
+    where: [{ field: 'projectId', operator: '==', value: projectId }],
+    orderBy: { field: 'createdAt', direction: 'desc' }
   });
-  const { data: teams } = useQuery('Team');
-  const { data: teamMembers } = useQuery('TeamMember', {
-    where: { status: 'Active' }
+  const { data: teams } = useCollection<Team>('teams');
+  const { data: teamMembers } = useCollection<TeamMember>('teamMembers', {
+    where: [{ field: 'status', operator: '==', value: 'Active' }]
   });
-  const { data: comments } = useQuery('TaskComment');
-  const { data: projects } = useQuery('Project');
+  const { data: comments } = useCollection<any>('taskComments');
+  const { data: projects } = useCollection<Project>('projects');
 
-  const projectMutation = useMutation('Project');
-  const taskMutation = useMutation('Task');
-  const commentMutation = useMutation('TaskComment');
+  const projectMutation = useMutation<Project>('projects');
+  const taskMutation = useMutation<Task>('tasks');
+  const commentMutation = useMutation<any>('taskComments');
 
   // Filter tasks
   const tasks = React.useMemo(() => {

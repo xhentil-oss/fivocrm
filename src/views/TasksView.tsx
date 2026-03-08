@@ -52,13 +52,10 @@ const TasksView: React.FC = () => {
   }, [activeTimeEntries]);
 
   // Mutations
-  const taskMutation = useMutation('Task');
-  const commentMutation = useMutation('TaskComment');
-  const notificationMutation = useMutation('Notification');
-  const collaboratorMutation = useMutation('TaskCollaborator');
-
-  // Lazy queries
-  const { query: queryTasks } = useLazyQuery('Task');
+  const taskMutation = useMutation<Task>('tasks');
+  const commentMutation = useMutation<TaskComment>('taskComments');
+  const notificationMutation = useMutation<Notification>('notifications');
+  const collaboratorMutation = useMutation<TaskCollaborator>('taskCollaborators');
 
   // Filter tasks - exclude subtasks from main list
   const tasks = React.useMemo(() => {

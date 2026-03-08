@@ -15,13 +15,12 @@ import type { Notification } from '../types';
 
 const NotificationsCenter: React.FC = () => {
   const { user } = useAuth();
-  const { data: notifications, isPending } = useQuery('Notification', {
-    where: user ? { userId: user.id } : undefined,
-    orderBy: { createdAt: 'desc' },
-    limit: 50,
+  const { data: notifications, loading: isPending } = useCollection<Notification>('notifications', {
+    where: user ? [{ field: 'userId', operator: '==', value: user.uid }] : undefined,
+    orderBy: { field: 'createdAt', direction: 'desc' },
   });
 
-  const notificationMutation = useMutation('Notification');
+  const notificationMutation = useMutation<Notification>('notifications');
 
   const unreadCount = notifications?.filter(n => !n.isRead).length || 0;
 

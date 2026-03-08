@@ -56,26 +56,18 @@ const ChatView: React.FC = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // Fetch team members for direct messaging
-  const { data: teamMembers } = useQuery('TeamMember', {
-    where: { status: 'Active' },
+  const { data: teamMembers } = useCollection<any>('teamMembers', {
+    where: [{ field: 'status', operator: '==', value: 'Active' }],
   });
 
   // Fetch messages for the active channel
-  const { data: channelMessages, isPending: channelPending, error: channelError } = useQuery('Message', {
-    where: { channelId: activeChannel },
-    orderBy: { createdAt: 'asc' },
+  const { data: channelMessages, loading: channelPending } = useCollection<ChatMessage>('messages', {
+    where: [{ field: 'channelId', operator: '==', value: activeChannel }],
+    orderBy: { field: 'createdAt', direction: 'asc' },
   });
 
   // Fetch all direct messages where user is sender or receiver
-  const { data: allDirectMessages, isPending: directPending, error: directError } = useQuery('Message', {
-    where: {
-      OR: [
-        { senderId: user?.id || '' },
-        { receiverId: user?.id || '' },
-      ],
-    },
-    orderBy: { createdAt: 'asc' },
-  });
+  const { data: allDirectMessages, loading: directPending } = useCollection<ChatMessage>('messages');
 
   // Filter direct messages for the active conversation
   const directMessages = allDirectMessages?.filter(m => 

@@ -19,11 +19,11 @@ const ExpensesView: React.FC = () => {
   const [selectedExpense, setSelectedExpense] = useState<Expense | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
-  const { data: expenses, isPending: expensesLoading } = useQuery('Expense', {
-    orderBy: { createdAt: 'desc' }
+  const { data: expenses, loading: expensesLoading } = useCollection<Expense>('expenses', {
+    orderBy: { field: 'createdAt', direction: 'desc' }
   });
-  const { data: teams } = useQuery('Team');
-  const expenseMutation = useMutation('Expense');
+  const { data: teams } = useCollection<Team>('teams');
+  const expenseMutation = useMutation<Expense>('expenses');
 
   const handleCreateExpense = async (formData: FormData) => {
     const title = formData.get('title') as string;
