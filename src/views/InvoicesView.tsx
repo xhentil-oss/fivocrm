@@ -34,11 +34,11 @@ const InvoicesView: React.FC = () => {
   const [editingField, setEditingField] = useState<string | null>(null);
   const [editValue, setEditValue] = useState<string>('');
 
-  const { data: invoices, isPending: invoicesLoading } = useQuery('Invoice', {
-    orderBy: { createdAt: 'desc' }
+  const { data: invoices, loading: invoicesLoading } = useCollection<Invoice>('invoices', {
+    orderBy: { field: 'createdAt', direction: 'desc' }
   });
-  const { data: customers } = useQuery('Customer');
-  const invoiceMutation = useMutation('Invoice');
+  const { data: customers } = useCollection<Customer>('customers');
+  const invoiceMutation = useMutation<Invoice>('invoices');
 
   const handleSendEmail = async (invoiceId: string) => {
     await invoiceMutation.update(invoiceId, { emailSent: true });

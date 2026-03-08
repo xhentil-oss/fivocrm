@@ -32,17 +32,17 @@ const TasksView: React.FC = () => {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
 
   // Fetch data
-  const { data: allTasks, isPending: tasksLoading } = useQuery('Task', {
-    orderBy: { createdAt: 'desc' }
+  const { data: allTasks, loading: tasksLoading } = useCollection<Task>('tasks', {
+    orderBy: { field: 'createdAt', direction: 'desc' }
   });
-  const { data: projects } = useQuery('Project');
-  const { data: comments } = useQuery('TaskComment');
-  const { data: collaborators } = useQuery('TaskCollaborator');
-  const { data: userProfiles } = useQuery('UserProfile');
+  const { data: projects } = useCollection<Project>('projects');
+  const { data: comments } = useCollection<TaskComment>('taskComments');
+  const { data: collaborators } = useCollection<TaskCollaborator>('taskCollaborators');
+  const { data: userProfiles } = useCollection<UserProfile>('userProfiles');
   
   // Get all active time entries to show who's working on what
-  const { data: activeTimeEntries } = useQuery('TimeEntry', {
-    where: { endTime: undefined }
+  const { data: activeTimeEntries } = useCollection<TimeEntry>('timeEntries', {
+    where: [{ field: 'endTime', operator: '==', value: null }]
   });
 
   // Get tasks that are currently being worked on
