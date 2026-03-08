@@ -261,7 +261,7 @@ const UserProfileView: React.FC<UserProfileViewProps> = ({ userId }) => {
                 <User className="w-12 h-12 text-primary" />
               </div>
             )}
-            <h2 className=\"text-h3 text-foreground\">{displayUser?.displayName || 'User'}</h2>
+            <h2 className="text-h3 text-foreground">{displayUser?.displayName || 'User'}</h2>
             <p className="text-body-sm text-muted-foreground">{displayUser?.email}</p>
             {isDemoMode && (
               <Badge className="mt-2" variant="secondary">
