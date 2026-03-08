@@ -74,7 +74,7 @@ const UserProfileView: React.FC<UserProfileViewProps> = ({ userId }) => {
   const [isDemoMode, setIsDemoMode] = useState(false);
   const [selectedDemoProfile, setSelectedDemoProfile] = useState(DEMO_PROFILES[0]);
 
-  const targetUserId = userId || currentUser?.id;
+  const targetUserId = userId || currentUser?.uid;
   
   // Get display user based on demo mode
   const displayUser = isDemoMode ? {

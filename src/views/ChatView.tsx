@@ -61,19 +61,19 @@ const ChatView: React.FC = () => {
   });
 
   // Fetch messages for the active channel
-  const { data: channelMessages, loading: channelPending } = useCollection<ChatMessage>('messages', {
+  const { data: channelMessages, loading: channelPending, error: channelError } = useCollection<ChatMessage>('messages', {
     where: [{ field: 'channelId', operator: '==', value: activeChannel }],
     orderBy: { field: 'createdAt', direction: 'asc' },
   });
 
   // Fetch all direct messages where user is sender or receiver
-  const { data: allDirectMessages, loading: directPending } = useCollection<ChatMessage>('messages');
+  const { data: allDirectMessages, loading: directPending, error: directError } = useCollection<ChatMessage>('messages');
 
   // Filter direct messages for the active conversation
   const directMessages = allDirectMessages?.filter(m => 
     !m.channelId && (
-      (m.senderId === user?.id && m.receiverId === activeDirectUserId) ||
-      (m.senderId === activeDirectUserId && m.receiverId === user?.id)
+      (m.senderId === user?.uid && m.receiverId === activeDirectUserId) ||
+      (m.senderId === activeDirectUserId && m.receiverId === user?.uid)
     )
   ) || [];
 
@@ -102,7 +102,7 @@ const ChatView: React.FC = () => {
     return allDirectMessages?.filter(m => 
       !m.channelId && 
       m.senderId === userId && 
-      m.receiverId === user?.id && 
+      m.receiverId === user?.uid && 
       !m.isRead
     ).length || 0;
   };
