@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useQuery, useMutation, useAuth } from '@animaapp/playground-react-sdk';
+import { useCollection, useMutation } from '../hooks/useFirestore';
+import { useAuth } from '../contexts/AuthContext';
 import { Clock, Play, Pause, Square, Plus, Timer, DollarSign, Tag, Calendar as CalendarIcon, TrendingUp } from 'lucide-react';
 import { Card } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
@@ -11,7 +12,7 @@ import { Textarea } from '../components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import { Switch } from '../components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
-import type { TimeEntry, Task, Project } from '@animaapp/playground-react-sdk';
+import type { TimeEntry, Task, Project } from '../types';
 
 const TimeTrackingView: React.FC = () => {
   const { user } = useAuth({ requireAuth: true });

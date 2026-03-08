@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useQuery, useMutation, useAuth } from '@animaapp/playground-react-sdk';
+import { useCollection, useMutation, useDocument } from '../hooks/useFirestore';
+import { useAuth } from '../contexts/AuthContext';
 import { ArrowLeft, Plus, LayoutGrid, List, Calendar as CalendarIcon, Users, Settings, MoreVertical, Upload, Download, Trash2, FileText, MessageSquare, CheckSquare, Filter, Search } from 'lucide-react';
 import { Card } from '../components/ui/card';
 import { Button } from '../components/ui/button';
@@ -21,7 +22,7 @@ import {
   DropdownMenuTrigger,
 } from '../components/ui/dropdown-menu';
 import TaskDetailPanel from '../components/TaskDetailPanel';
-import type { Task, Project, Team, TeamMember } from '@animaapp/playground-react-sdk';
+import type { Task, Project, Team, TeamMember } from '../types';
 
 const ProjectDetailView: React.FC = () => {
   const { projectId } = useParams<{ projectId: string }>();

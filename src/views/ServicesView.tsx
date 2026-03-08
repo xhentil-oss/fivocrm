@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useQuery, useMutation } from '@animaapp/playground-react-sdk';
+import { useCollection, useMutation } from '../hooks/useFirestore';
 import { ShoppingCart, Plus, DollarSign, Tag, Eye, Edit, Trash2 } from 'lucide-react';
 import { Card } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Textarea } from '../components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
-import type { Service } from '@animaapp/playground-react-sdk';
+import type { Service } from '../types';
 
 const ServicesView: React.FC = () => {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);

@@ -1,4 +1,5 @@
-import { useQuery, useAuth } from '@animaapp/playground-react-sdk';
+import { useCollection } from './useFirestore';
+import { useAuth } from '../contexts/AuthContext';
 import { useMemo } from 'react';
 
 export type UserPermissions = {

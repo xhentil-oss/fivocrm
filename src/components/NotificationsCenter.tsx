@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { useQuery, useMutation, useAuth } from '@animaapp/playground-react-sdk';
+import { useCollection, useMutation } from '../hooks/useFirestore';
+import { useAuth } from '../contexts/AuthContext';
 import { Bell, Check, Trash2, Mail, Calendar, User, AlertCircle, CheckCircle, Info } from 'lucide-react';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
@@ -10,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from './ui/dropdown-menu';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
-import type { Notification } from '@animaapp/playground-react-sdk';
+import type { Notification } from '../types';
 
 const NotificationsCenter: React.FC = () => {
   const { user } = useAuth();

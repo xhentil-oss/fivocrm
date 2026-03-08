@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { useQuery, useMutation, useAuth } from '@animaapp/playground-react-sdk';
+import { useCollection, useMutation } from '../hooks/useFirestore';
+import { useAuth } from '../contexts/AuthContext';
 import { Mail, Phone, Building, DollarSign, TrendingUp, Plus, Calendar as CalendarIcon } from 'lucide-react';
 import { Card } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
@@ -13,7 +14,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { Textarea } from '../components/ui/textarea';
 import DetailDrawer from '../components/DetailDrawer';
-import type { Lead } from '@animaapp/playground-react-sdk';
+import type { Lead } from '../types';
 
 const CRMView: React.FC = () => {
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);

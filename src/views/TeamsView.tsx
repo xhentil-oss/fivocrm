@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { useQuery, useMutation, useAuth } from '@animaapp/playground-react-sdk';
+import { useCollection, useMutation } from '../hooks/useFirestore';
+import { useAuth } from '../contexts/AuthContext';
 import { Users, Plus, MoreVertical, Mail, UserPlus, Shield, Trash2, CheckCircle, XCircle, Clock, Edit2, Check, X, Settings, Eye } from 'lucide-react';
 import { usePermissions } from '../hooks/usePermissions';
 import { Card } from '../components/ui/card';
@@ -18,7 +19,7 @@ import {
   DropdownMenuTrigger,
 } from '../components/ui/dropdown-menu';
 import ExportButton from '../components/ExportButton';
-import type { Team, TeamMember, TeamInvite } from '@animaapp/playground-react-sdk';
+import type { Team, TeamMember, TeamInvite } from '../types';
 
 const TeamsView: React.FC = () => {
   const { user } = useAuth({ requireAuth: true });

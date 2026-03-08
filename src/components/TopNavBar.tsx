@@ -1,7 +1,7 @@
 import React from 'react';
 import { Search, Plus, User, Moon, Menu, X, LogOut } from 'lucide-react';
 import { Button } from './ui/button';
-import { useAuth } from '@animaapp/playground-react-sdk';
+import { useAuth } from '../contexts/AuthContext';
 import {
   DropdownMenu,
   DropdownMenuContent,

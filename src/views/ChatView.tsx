@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useQuery, useMutation, useAuth } from '@animaapp/playground-react-sdk';
+import { useCollection, useMutation } from '../hooks/useFirestore';
+import { useAuth } from '../contexts/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Input } from '../components/ui/input';
 import { Button } from '../components/ui/button';
@@ -8,6 +9,7 @@ import { Badge } from '../components/ui/badge';
 import { Separator } from '../components/ui/separator';
 import { Send, MessageSquare, Users, Hash, Paperclip, X, FileIcon, User, Circle } from 'lucide-react';
 import { useToast } from '../hooks/use-toast';
+import type { ChatMessage, Channel, UserProfile } from '../types';
 
 type Message = {
   id: string;

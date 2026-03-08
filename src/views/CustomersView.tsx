@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { useQuery, useMutation } from '@animaapp/playground-react-sdk';
+import { useCollection, useMutation } from '../hooks/useFirestore';
 import { Building2, Plus, Mail, Phone, MapPin, Search, Filter, X, CheckCircle2, XCircle, AlertCircle, Star, Users } from 'lucide-react';
 import { Card } from '../components/ui/card';
 import { Button } from '../components/ui/button';
@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Textarea } from '../components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import { Badge } from '../components/ui/badge';
-import type { Customer } from '@animaapp/playground-react-sdk';
+import type { Customer } from '../types';
 
 // Status options with Albanian labels
 const STATUS_OPTIONS = [

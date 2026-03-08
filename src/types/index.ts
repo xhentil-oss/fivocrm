@@ -92,10 +92,12 @@ export interface Invoice {
 
 export interface Service {
   id: string;
-  name: string;
+  name?: string;
+  title?: string;
   description?: string;
   price: number;
   category?: string;
+  currency?: string;
   createdAt: Date;
   updatedAt: Date;
   createdByUserId: string | null;
@@ -107,6 +109,7 @@ export interface Expense {
   amount: number;
   category?: string;
   date?: Date;
+  teamId?: string;
   createdAt: Date;
   updatedAt: Date;
   createdByUserId: string | null;
@@ -120,6 +123,7 @@ export interface Goal {
   currentValue?: number;
   dueDate?: Date;
   status: 'Not Started' | 'In Progress' | 'Completed';
+  teamId?: string;
   createdAt: Date;
   updatedAt: Date;
   createdByUserId: string | null;
@@ -137,4 +141,105 @@ export interface Lead {
   createdAt: Date;
   updatedAt: Date;
   createdByUserId: string | null;
+}
+
+export interface InvoiceItem {
+  id: string;
+  invoiceId: string;
+  serviceId?: string;
+  description?: string;
+  quantity: number;
+  unitPrice: number;
+  totalPrice: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface TaskComment {
+  id: string;
+  taskId: string;
+  content: string;
+  userId: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface TaskCollaborator {
+  id: string;
+  taskId: string;
+  userId: string;
+  createdAt: Date;
+}
+
+export interface ChatMessage {
+  id: string;
+  content: string;
+  senderId: string;
+  receiverId?: string;
+  channelId?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface Channel {
+  id: string;
+  name: string;
+  description?: string;
+  isPrivate?: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  createdByUserId: string | null;
+}
+
+export interface TimeEntry {
+  id: string;
+  taskId?: string;
+  projectId?: string;
+  userId: string;
+  description?: string;
+  startTime: Date;
+  endTime?: Date;
+  duration?: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface Milestone {
+  id: string;
+  goalId: string;
+  title: string;
+  completed?: boolean;
+  dueDate?: Date;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface TeamInvite {
+  id: string;
+  teamId: string;
+  email: string;
+  role: string;
+  status: 'Pending' | 'Accepted' | 'Rejected';
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface UserProfile {
+  id: string;
+  userId: string;
+  displayName?: string;
+  avatarUrl?: string;
+  bio?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface Notification {
+  id: string;
+  userId: string;
+  type: string;
+  title: string;
+  message?: string;
+  read?: boolean;
+  createdAt: Date;
 }

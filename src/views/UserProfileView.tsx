@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useQuery, useMutation, useAuth, useLazyQuery } from '@animaapp/playground-react-sdk';
+import { useCollection, useMutation } from '../hooks/useFirestore';
+import { useAuth } from '../contexts/AuthContext';
 import { User, Briefcase, MapPin, Phone, Mail, Award, Edit, Save, X, Users, ChevronDown, Check, FlaskConical } from 'lucide-react';
 import { Card } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
@@ -17,7 +18,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuLabel,
 } from '../components/ui/dropdown-menu';
-import type { UserProfile, Task, Project, Goal } from '@animaapp/playground-react-sdk';
+import type { UserProfile, Task, Project, Goal } from '../types';
 
 // Demo profiles for testing different user roles
 const DEMO_PROFILES = [

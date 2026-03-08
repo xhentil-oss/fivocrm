@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useQuery, useMutation, useLazyQuery } from '@animaapp/playground-react-sdk';
+import { useCollection, useMutation } from '../hooks/useFirestore';
 import { DollarSign, Plus, Calendar as CalendarIcon, CreditCard, Mail, Send, Building2, ShoppingCart, Trash2, Eye, Edit2, Check, X, ExternalLink, Loader2 } from 'lucide-react';
 import ExportButton from '../components/ExportButton';
 import { Card } from '../components/ui/card';
@@ -12,7 +12,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '../components/ui/popove
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../components/ui/dialog';
 import { Textarea } from '../components/ui/textarea';
-import type { Invoice, Customer, Service, InvoiceItem } from '@animaapp/playground-react-sdk';
+import type { Invoice, Customer, Service, InvoiceItem } from '../types';
 
 const getStatusColor = (status: string) => {
   switch (status) {

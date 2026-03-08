@@ -1,41 +1,9 @@
 import React, { useMemo } from 'react';
 import { TrendingUp, TrendingDown, DollarSign, Users, CheckCircle, Clock, Building2, Receipt } from 'lucide-react';
 import { Card } from '../components/ui/card';
-import { useQuery, useLazyQuery } from '@animaapp/playground-react-sdk';
+import { useCollection } from '../hooks/useFirestore';
 import { Badge } from '../components/ui/badge';
-
-type Invoice = {
-  id: string;
-  amount: number;
-  paymentMethod: string;
-  status: string;
-  projectId: string;
-  dueDate: Date;
-  createdAt: Date;
-  updatedAt: Date;
-  createdByUserId: string | null;
-};
-
-type Project = {
-  id: string;
-  name: string;
-  description?: string;
-  status: string;
-  customerId?: string;
-  teamId?: string;
-  createdAt: Date;
-  updatedAt: Date;
-  createdByUserId: string | null;
-};
-
-type Team = {
-  id: string;
-  name: string;
-  department?: string;
-  createdAt: Date;
-  updatedAt: Date;
-  createdByUserId: string | null;
-};
+import type { Invoice, Project, Team, Expense, Service, InvoiceItem } from '../types';
 
 const ReportsView: React.FC = () => {
   // Fetch all invoices

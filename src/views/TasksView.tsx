@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { useQuery, useMutation, useAuth, useLazyQuery } from '@animaapp/playground-react-sdk';
+import { useCollection, useMutation } from '../hooks/useFirestore';
+import { useAuth } from '../contexts/AuthContext';
 import { Calendar as CalendarIcon, User, Flag, MoreVertical, Plus, MessageSquare, CalendarDays, Filter, List, LayoutGrid, Users, ChevronRight, ChevronDown, Target, Clock, Play, Pause, Square, Check, X } from 'lucide-react';
 import { Card } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
@@ -19,7 +20,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '../components/ui/dropdown-menu';
-import type { Task, TaskComment, Project, Notification, TaskCollaborator, UserProfile, TimeEntry } from '@animaapp/playground-react-sdk';
+import type { Task, TaskComment, Project, Notification, TaskCollaborator, UserProfile, TimeEntry } from '../types';
 import TaskDetailPanel from '../components/TaskDetailPanel';
 
 const TasksView: React.FC = () => {
