@@ -136,10 +136,10 @@ const TopNavBar: React.FC<TopNavBarProps> = ({
                 className="bg-white/10 text-primary-foreground hover:bg-white/20"
                 aria-label="User menu"
               >
-                {user?.profilePictureUrl ? (
+                {user?.photoURL ? (
                   <img 
-                    src={user.profilePictureUrl} 
-                    alt={user.name} 
+                    src={user.photoURL} 
+                    alt={user.displayName || 'User'} 
                     className="w-8 h-8 rounded-full"
                   />
                 ) : (
@@ -152,7 +152,7 @@ const TopNavBar: React.FC<TopNavBarProps> = ({
                 <>
                   <DropdownMenuLabel className="text-foreground">
                     <div className="flex flex-col">
-                      <span className="font-medium">{user.name}</span>
+                      <span className="font-medium">{user.displayName || 'User'}</span>
                       <span className="text-xs text-muted-foreground">{user.email}</span>
                     </div>
                   </DropdownMenuLabel>

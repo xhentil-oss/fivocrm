@@ -44,7 +44,7 @@ const TimeTrackingView: React.FC = () => {
   // Find running entry on mount
   useEffect(() => {
     if (timeEntries && user) {
-      const running = timeEntries.find(entry => !entry.endTime && entry.userId === user.id);
+      const running = timeEntries.find(entry => !entry.endTime && entry.userId === user.uid);
       if (running) {
         setRunningEntry(running);
         const elapsed = Math.floor((Date.now() - new Date(running.startTime).getTime()) / 1000);
@@ -138,7 +138,7 @@ const TimeTrackingView: React.FC = () => {
     if (!user) return;
 
     const newEntry = await timeEntryMutation.create({
-      userId: user.id,
+      userId: user.uid,
       taskId,
       projectId,
       description,
@@ -183,7 +183,7 @@ const TimeTrackingView: React.FC = () => {
     const duration = Math.floor((end.getTime() - start.getTime()) / 60000);
 
     await timeEntryMutation.create({
-      userId: user.id,
+      userId: user.uid,
       taskId: taskId || undefined,
       projectId: projectId || undefined,
       description: description || undefined,

@@ -34,12 +34,12 @@ export function usePermissions(): UserPermissions {
 
   const { data: teams } = useCollection<any>('teams');
 
-  // Filter team members for current user (check both user.id and user.email)
+  // Filter team members for current user (check both user.uid and user.email)
   const teamMembers = useMemo(() => {
     if (!user || !allTeamMembers) return [];
     
     const filtered = allTeamMembers.filter(m => 
-      m.userId === user.id || 
+      m.userId === user.uid || 
       m.userId === user.email ||
       m.userId.toLowerCase() === user.email?.toLowerCase()
     );

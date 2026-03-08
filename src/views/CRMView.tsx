@@ -107,7 +107,7 @@ const CRMView: React.FC = () => {
       // Send notification
       if (user) {
         await notificationMutation.create({
-          userId: user.id,
+          userId: user.uid,
           title: 'Lead Converted to Customer',
           message: `${lead.name} has been converted to a customer!`,
           isRead: false,

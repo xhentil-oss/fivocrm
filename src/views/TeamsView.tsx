@@ -78,7 +78,7 @@ const TeamsView: React.FC = () => {
       email,
       teamId: selectedTeam.id,
       role,
-      invitedByUserId: user.id,
+      invitedByUserId: user.uid,
       token,
       expiresAt,
       status: 'Pending',
@@ -111,7 +111,7 @@ const TeamsView: React.FC = () => {
       canAccessInvoices,
       canAccessReports,
       canAccessSettings,
-      invitedByUserId: user.id,
+      invitedByUserId: user.uid,
       invitedAt: new Date(),
       status: 'Active',
     });
@@ -124,7 +124,7 @@ const TeamsView: React.FC = () => {
 
     // Create team member
     await memberMutation.create({
-      userId: user.id,
+      userId: user.uid,
       teamId: invite.teamId,
       role: invite.role,
       canAccessProjects: true,

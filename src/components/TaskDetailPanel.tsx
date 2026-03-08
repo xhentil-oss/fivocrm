@@ -127,7 +127,7 @@ const TaskDetailPanel: React.FC<TaskDetailPanelProps> = ({
   // Find running entry for this task
   const runningEntry = React.useMemo(() => {
     if (!timeEntries || !user) return null;
-    return timeEntries.find(entry => !entry.endTime && entry.userId === user.id);
+    return timeEntries.find(entry => !entry.endTime && entry.userId === user.uid);
   }, [timeEntries, user]);
 
   // Update elapsed time
@@ -213,7 +213,7 @@ const TaskDetailPanel: React.FC<TaskDetailPanelProps> = ({
       priority: subtaskForm.priority,
       startDate: subtaskForm.startDate,
       endDate: subtaskForm.endDate,
-      assignedToUserId: subtaskForm.assignedToUserId || user.id,
+      assignedToUserId: subtaskForm.assignedToUserId || user.uid,
       projectId: task.projectId,
       parentTaskId: task.id,
       collaboratorIds: '[]',
@@ -267,7 +267,7 @@ const TaskDetailPanel: React.FC<TaskDetailPanelProps> = ({
     if (!user) return;
 
     await timeEntryMutation.create({
-      userId: user.id,
+      userId: user.uid,
       taskId: task.id,
       projectId: task.projectId,
       description: `Working on: ${task.title}`,
@@ -405,7 +405,7 @@ const TaskDetailPanel: React.FC<TaskDetailPanelProps> = ({
     try {
       await messageMutation.create({
         content: chatMessageText,
-        senderId: user.id,
+        senderId: user.uid,
         taskId: task.id,
         isRead: false,
       });
@@ -513,20 +513,20 @@ const TaskDetailPanel: React.FC<TaskDetailPanelProps> = ({
                     {user && (
                       <button
                         className={`w-full flex items-center gap-2 px-2 py-2 rounded hover:bg-muted/50 text-left ${
-                          task.assignedToUserId === user.id ? 'bg-primary/10' : ''
+                          task.assignedToUserId === user.uid ? 'bg-primary/10' : ''
                         }`}
                         onClick={async () => {
-                          await onUpdate(task.id, { assignedToUserId: user.id });
+                          await onUpdate(task.id, { assignedToUserId: user.uid });
                         }}
                       >
                         <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center text-xs font-medium">
-                          {user.name?.slice(0, 2).toUpperCase() || 'U'}
+                          {user.displayName?.slice(0, 2).toUpperCase() || 'U'}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium truncate">{user.name || 'Ti'}</p>
+                          <p className="text-sm font-medium truncate">{user.displayName || 'Ti'}</p>
                           <p className="text-xs text-muted-foreground truncate">{user.email}</p>
                         </div>
-                        {task.assignedToUserId === user.id && (
+                        {task.assignedToUserId === user.uid && (
                           <Check className="w-4 h-4 text-primary" />
                         )}
                       </button>

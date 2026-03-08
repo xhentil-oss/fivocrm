@@ -130,7 +130,7 @@ const TaskDetailDialog: React.FC<TaskDetailDialogProps> = ({
   // Find running entry for this task
   const runningEntry = React.useMemo(() => {
     if (!timeEntries || !user) return null;
-    return timeEntries.find(entry => !entry.endTime && entry.userId === user.id);
+    return timeEntries.find(entry => !entry.endTime && entry.userId === user.uid);
   }, [timeEntries, user]);
 
   // Update elapsed time
@@ -197,7 +197,7 @@ const TaskDetailDialog: React.FC<TaskDetailDialogProps> = ({
       priority: subtaskForm.priority,
       startDate: subtaskForm.startDate,
       endDate: subtaskForm.endDate,
-      assignedToUserId: subtaskForm.assignedToUserId || user.id,
+      assignedToUserId: subtaskForm.assignedToUserId || user.uid,
       projectId: task.projectId,
       parentTaskId: task.id,
       collaboratorIds: '[]',
@@ -251,7 +251,7 @@ const TaskDetailDialog: React.FC<TaskDetailDialogProps> = ({
     if (!user) return;
 
     await timeEntryMutation.create({
-      userId: user.id,
+      userId: user.uid,
       taskId: task.id,
       projectId: task.projectId,
       description: `Working on: ${task.title}`,
@@ -402,7 +402,7 @@ const TaskDetailDialog: React.FC<TaskDetailDialogProps> = ({
     try {
       await messageMutation.create({
         content: chatMessageText,
-        senderId: user.id,
+        senderId: user.uid,
         taskId: task.id,
         isRead: false,
       });
@@ -1091,11 +1091,11 @@ const TaskDetailDialog: React.FC<TaskDetailDialogProps> = ({
                           handleSendChatMessage();
                         }
                       }}
-                      disabled={messageMutation.isPending}
+                      disabled={messageMutation.loading}
                     />
                     <Button 
                       onClick={handleSendChatMessage} 
-                      disabled={!chatMessageText.trim() || messageMutation.isPending}
+                      disabled={!chatMessageText.trim() || messageMutation.loading}
                       size="sm"
                     >
                       <Send className="w-4 h-4" />

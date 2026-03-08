@@ -46,7 +46,7 @@ const GoalsView: React.FC = () => {
 
   const myGoals = React.useMemo(() => {
     if (!user || !allGoals) return [];
-    return allGoals.filter(g => g.ownerId === user.id);
+    return allGoals.filter(g => g.ownerId === user.uid);
   }, [allGoals, user]);
 
   const getStatusIcon = (status: string) => {

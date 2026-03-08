@@ -80,7 +80,7 @@ const TasksView: React.FC = () => {
 
   const myTasks = React.useMemo(() => {
     if (!user || !allTasks) return [];
-    return allTasks.filter(t => t.assignedToUserId === user.id && !t.parentTaskId);
+    return allTasks.filter(t => t.assignedToUserId === user.uid && !t.parentTaskId);
   }, [allTasks, user]);
 
   const getPriorityColor = (priority?: string) => {

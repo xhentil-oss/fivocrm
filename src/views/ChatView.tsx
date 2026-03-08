@@ -89,8 +89,8 @@ const ChatView: React.FC = () => {
     const userIds = new Set<string>();
     allDirectMessages.forEach(m => {
       if (!m.channelId) {
-        if (m.senderId !== user.id) userIds.add(m.senderId);
-        if (m.receiverId && m.receiverId !== user.id) userIds.add(m.receiverId);
+        if (m.senderId !== user.uid) userIds.add(m.senderId);
+        if (m.receiverId && m.receiverId !== user.uid) userIds.add(m.receiverId);
       }
     });
     
@@ -108,9 +108,10 @@ const ChatView: React.FC = () => {
   };
 
   // Get other team members (excluding current user)
-  const otherMembers = teamMembers?.filter(m => m.userId !== user?.id) || [];
+  const otherMembers = teamMembers?.filter(m => m.userId !== user?.uid) || [];
 
-  const { create, isPending: isSending, error: sendError } = useMutation('Message');
+  const messageMutation = useMutation<ChatMessage>('messages');
+  const isSending = messageMutation.loading;
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -125,21 +126,21 @@ const ChatView: React.FC = () => {
 
     try {
       if (chatMode === 'channel') {
-        await create({
+        await messageMutation.create({
           content: messageText || '📎 Attachment',
-          senderId: user.id,
+          senderId: user.uid,
           channelId: activeChannel,
           isRead: false,
           attachmentUrl: attachmentUrl.trim() || undefined,
-        });
+        } as any);
       } else if (activeDirectUserId) {
-        await create({
+        await messageMutation.create({
           content: messageText || '📎 Attachment',
-          senderId: user.id,
+          senderId: user.uid,
           receiverId: activeDirectUserId,
           isRead: false,
           attachmentUrl: attachmentUrl.trim() || undefined,
-        });
+        } as any);
       }
       setMessageText('');
       setAttachmentUrl('');
