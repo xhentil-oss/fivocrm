@@ -100,6 +100,32 @@ const TaskDetailPanel: React.FC<TaskDetailPanelProps> = ({
   const notificationMutation = useMutation<any>('notifications');
   const messageMutation = useMutation<any>('messages');
 
+  // Helper for priority colors
+  const getPriorityColor = (priority?: string) => {
+    switch (priority) {
+      case 'urgent':
+        return 'bg-error text-error-foreground';
+      case 'high':
+        return 'bg-warning text-warning-foreground';
+      case 'medium':
+        return 'bg-info text-info-foreground';
+      case 'low':
+        return 'bg-success text-success-foreground';
+      default:
+        return 'bg-muted text-muted-foreground';
+    }
+  };
+
+  const getPriorityLabel = (priority?: string) => {
+    switch (priority) {
+      case 'urgent': return 'Urgjent';
+      case 'high': return 'Lartë';
+      case 'medium': return 'Mesatar';
+      case 'low': return 'Ulët';
+      default: return 'Mesatar';
+    }
+  };
+
   // Parse attachments from JSON
   const attachments = React.useMemo(() => {
     if (!task.attachments) return [];
@@ -806,31 +832,199 @@ const TaskDetailPanel: React.FC<TaskDetailPanelProps> = ({
               {subtasks && subtasks.length > 0 && (
                 <div className="space-y-2">
                   {subtasks.map(subtask => (
-                    <div 
-                      key={subtask.id} 
-                      className={`flex items-center gap-3 p-2 rounded ${
-                        subtask.status === 'Done' ? 'bg-success/10' : 'hover:bg-muted/50'
-                      }`}
-                    >
-                      <Checkbox 
-                        checked={subtask.status === 'Done'}
-                        onCheckedChange={(checked) => {
-                          handleUpdateSubtask(subtask.id, { 
-                            status: checked ? 'Done' : 'Todo' 
-                          });
-                        }}
-                      />
-                      <span className={`flex-1 text-sm ${subtask.status === 'Done' ? 'line-through text-muted-foreground' : ''}`}>
-                        {subtask.title}
-                      </span>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100"
-                        onClick={() => handleDeleteSubtask(subtask.id)}
+                    <div key={subtask.id}>
+                      {/* Subtask Card - Clickable to expand */}
+                      <div 
+                        className={`group border rounded-lg p-3 cursor-pointer transition-all ${
+                          subtask.status === 'Done' ? 'bg-success/10 border-success/20' : 'hover:bg-muted/50 hover:border-primary/30'
+                        } ${editingSubtask === subtask.id ? 'ring-2 ring-primary' : ''}`}
+                        onClick={() => editingSubtask !== subtask.id && startEditingSubtask(subtask)}
                       >
-                        <Trash2 className="w-3 h-3 text-muted-foreground" />
-                      </Button>
+                        {/* Top row: Checkbox + Title + Delete */}
+                        <div className="flex items-start gap-3">
+                          <Checkbox 
+                            checked={subtask.status === 'Done'}
+                            onClick={(e) => e.stopPropagation()}
+                            onCheckedChange={(checked) => {
+                              handleUpdateSubtask(subtask.id, { 
+                                status: checked ? 'Done' : 'Todo' 
+                              });
+                            }}
+                            className="mt-0.5"
+                          />
+                          <div className="flex-1 min-w-0">
+                            <p className={`text-sm font-medium ${subtask.status === 'Done' ? 'line-through text-muted-foreground' : ''}`}>
+                              {subtask.title}
+                            </p>
+                            {subtask.description && (
+                              <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                                {subtask.description}
+                              </p>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeleteSubtask(subtask.id);
+                              }}
+                            >
+                              <Trash2 className="w-3 h-3 text-muted-foreground" />
+                            </Button>
+                          </div>
+                        </div>
+                        
+                        {/* Bottom row: Priority + Assignee + Due Date */}
+                        <div className="flex items-center gap-2 mt-2 ml-7 flex-wrap">
+                          <Badge className={`text-xs ${getPriorityColor(subtask.priority)}`}>
+                            {getPriorityLabel(subtask.priority)}
+                          </Badge>
+                          {subtask.assignedToUserId && (
+                            <span className="text-xs text-muted-foreground flex items-center gap-1">
+                              <Users className="w-3 h-3" />
+                              {subtask.assignedToUserId.slice(0, 8)}...
+                            </span>
+                          )}
+                          {subtask.endDate && (
+                            <span className="text-xs text-muted-foreground flex items-center gap-1">
+                              <CalendarIcon className="w-3 h-3" />
+                              {new Date(subtask.endDate).toLocaleDateString('sq-AL', { day: 'numeric', month: 'short' })}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      
+                      {/* Expanded Edit Form */}
+                      {editingSubtask === subtask.id && (
+                        <div className="mt-2 bg-muted/30 rounded-lg p-3 space-y-3 border border-primary/20">
+                          <Input
+                            placeholder="Titulli i nën-detyrës"
+                            value={subtaskForm.title}
+                            onChange={(e) => setSubtaskForm({ ...subtaskForm, title: e.target.value })}
+                            onClick={(e) => e.stopPropagation()}
+                            className="text-sm"
+                          />
+                          <Textarea
+                            placeholder="Përshkrimi..."
+                            value={subtaskForm.description}
+                            onChange={(e) => setSubtaskForm({ ...subtaskForm, description: e.target.value })}
+                            onClick={(e) => e.stopPropagation()}
+                            className="text-sm min-h-[60px]"
+                          />
+                          <div className="grid grid-cols-2 gap-2">
+                            <Select
+                              value={subtaskForm.status}
+                              onValueChange={(value) => setSubtaskForm({ ...subtaskForm, status: value })}
+                            >
+                              <SelectTrigger className="text-sm">
+                                <SelectValue placeholder="Statusi" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="Todo">Për tu bërë</SelectItem>
+                                <SelectItem value="In Progress">Në progres</SelectItem>
+                                <SelectItem value="Review">Në rishikim</SelectItem>
+                                <SelectItem value="Done">Përfunduar</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <Select
+                              value={subtaskForm.priority}
+                              onValueChange={(value) => setSubtaskForm({ ...subtaskForm, priority: value })}
+                            >
+                              <SelectTrigger className="text-sm">
+                                <SelectValue placeholder="Prioriteti" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="urgent">Urgjent</SelectItem>
+                                <SelectItem value="high">Lartë</SelectItem>
+                                <SelectItem value="medium">Mesatar</SelectItem>
+                                <SelectItem value="low">Ulët</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div className="grid grid-cols-2 gap-2">
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <Button variant="outline" size="sm" className="justify-start text-sm">
+                                  <CalendarIcon className="w-3 h-3 mr-1" />
+                                  {subtaskForm.startDate.toLocaleDateString('sq-AL', { day: 'numeric', month: 'short' })}
+                                </Button>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-auto p-0">
+                                <Calendar
+                                  mode="single"
+                                  selected={subtaskForm.startDate}
+                                  onSelect={(date) => date && setSubtaskForm({ ...subtaskForm, startDate: date })}
+                                />
+                              </PopoverContent>
+                            </Popover>
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <Button variant="outline" size="sm" className="justify-start text-sm">
+                                  <CalendarIcon className="w-3 h-3 mr-1" />
+                                  {subtaskForm.endDate.toLocaleDateString('sq-AL', { day: 'numeric', month: 'short' })}
+                                </Button>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-auto p-0">
+                                <Calendar
+                                  mode="single"
+                                  selected={subtaskForm.endDate}
+                                  onSelect={(date) => date && setSubtaskForm({ ...subtaskForm, endDate: date })}
+                                />
+                              </PopoverContent>
+                            </Popover>
+                          </div>
+                          <Select
+                            value={subtaskForm.assignedToUserId}
+                            onValueChange={(value) => setSubtaskForm({ ...subtaskForm, assignedToUserId: value })}
+                          >
+                            <SelectTrigger className="text-sm">
+                              <SelectValue placeholder="Cakto personin përgjegjës" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {teamMembers?.map(member => (
+                                <SelectItem key={member.id} value={member.userId}>
+                                  {member.userId.slice(0, 12)}...
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <div className="flex gap-2 pt-2">
+                            <Button 
+                              size="sm" 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleUpdateSubtask(subtask.id, {
+                                  title: subtaskForm.title,
+                                  description: subtaskForm.description,
+                                  status: subtaskForm.status,
+                                  priority: subtaskForm.priority,
+                                  startDate: subtaskForm.startDate,
+                                  endDate: subtaskForm.endDate,
+                                  assignedToUserId: subtaskForm.assignedToUserId,
+                                });
+                                setEditingSubtask(null);
+                              }}
+                              disabled={!subtaskForm.title.trim()}
+                            >
+                              <Check className="w-3 h-3 mr-1" />
+                              Ruaj
+                            </Button>
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                cancelEditingSubtask();
+                              }}
+                            >
+                              Anulo
+                            </Button>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
