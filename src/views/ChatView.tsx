@@ -479,9 +479,9 @@ const ChatView: React.FC = () => {
                 </Button>
               </div>
             </form>
-            {sendError && (
+            {messageMutation.error && (
               <p className="text-sm text-destructive mt-2">
-                Error: {sendError.message}
+                Error: {messageMutation.error.message}
               </p>
             )}
           </CardContent>
