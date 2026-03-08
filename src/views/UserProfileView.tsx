@@ -78,8 +78,8 @@ const UserProfileView: React.FC<UserProfileViewProps> = ({ userId }) => {
   
   // Get display user based on demo mode
   const displayUser = isDemoMode ? {
-    id: selectedDemoProfile.id,
-    name: selectedDemoProfile.name,
+    uid: selectedDemoProfile.id,
+    displayName: selectedDemoProfile.name,
     email: selectedDemoProfile.email,
   } : currentUser;
 
@@ -158,7 +158,7 @@ const UserProfileView: React.FC<UserProfileViewProps> = ({ userId }) => {
     setSkills(skills.filter(s => s !== skill));
   };
 
-  const isOwnProfile = !userId || userId === currentUser?.id;
+  const isOwnProfile = !userId || userId === currentUser?.uid;
 
   return (
     <div className="space-y-6">
@@ -261,7 +261,7 @@ const UserProfileView: React.FC<UserProfileViewProps> = ({ userId }) => {
                 <User className="w-12 h-12 text-primary" />
               </div>
             )}
-            <h2 className="text-h3 text-foreground">{displayUser?.name || 'User'}</h2>
+            <h2 className=\"text-h3 text-foreground\">{displayUser?.displayName || 'User'}</h2>
             <p className="text-body-sm text-muted-foreground">{displayUser?.email}</p>
             {isDemoMode && (
               <Badge className="mt-2" variant="secondary">

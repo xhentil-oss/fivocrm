@@ -2,8 +2,6 @@ import { useState, useEffect, useCallback } from 'react';
 import {
   collection,
   doc,
-  getDocs,
-  getDoc,
   addDoc,
   updateDoc,
   deleteDoc,

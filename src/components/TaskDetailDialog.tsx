@@ -116,8 +116,8 @@ const TaskDetailDialog: React.FC<TaskDetailDialogProps> = ({
   // Users currently working on this task
   const activeWorkers = React.useMemo(() => {
     if (!allActiveTimeEntries) return [];
-    return allActiveTimeEntries.filter(entry => entry.taskId === task.id && entry.userId !== user?.id);
-  }, [allActiveTimeEntries, task.id, user?.id]);
+    return allActiveTimeEntries.filter(entry => entry.taskId === task.id && entry.userId !== user?.uid);
+  }, [allActiveTimeEntries, task.id, user?.uid]);
 
   // Filter team members for @mention suggestions
   const mentionSuggestions = React.useMemo(() => {
@@ -183,7 +183,7 @@ const TaskDetailDialog: React.FC<TaskDetailDialogProps> = ({
       priority: 'medium',
       startDate: new Date(),
       endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-      assignedToUserId: user?.id || '',
+      assignedToUserId: user?.uid || '',
     });
   };
 
@@ -312,11 +312,11 @@ const TaskDetailDialog: React.FC<TaskDetailDialogProps> = ({
       // Send notifications to mentioned users
       for (const mention of mentions) {
         const userId = mention.slice(1); // Remove @ symbol
-        if (userId !== user?.id) {
+        if (userId !== user?.uid) {
           await notificationMutation.create({
             userId,
             title: 'Ju përmendën në një koment',
-            message: `${user?.name || 'Dikush'} ju përmendi në detyrën: ${task.title}`,
+            message: `${user?.displayName || 'Dikush'} ju përmendi në detyrën: ${task.title}`,
             isRead: false,
           });
         }
@@ -342,7 +342,7 @@ const TaskDetailDialog: React.FC<TaskDetailDialogProps> = ({
         size: file.size,
         type: file.type,
         url: URL.createObjectURL(file), // Mock URL
-        uploadedBy: user?.id,
+        uploadedBy: user?.uid,
         uploadedAt: new Date().toISOString(),
       };
       newAttachments.push(attachment);
@@ -805,7 +805,7 @@ const TaskDetailDialog: React.FC<TaskDetailDialogProps> = ({
                           onChange={(e) => setSubtaskForm({ ...subtaskForm, assignedToUserId: e.target.value })}
                         />
                         <p className="text-xs text-muted-foreground mt-1">
-                          ID juaj: {user?.id || 'N/A'}
+                          ID juaj: {user?.uid || 'N/A'}
                         </p>
                       </div>
                     </div>
@@ -1037,7 +1037,7 @@ const TaskDetailDialog: React.FC<TaskDetailDialogProps> = ({
                       </div>
                     ) : taskMessages && taskMessages.length > 0 ? (
                       taskMessages.map((message) => {
-                        const isOwnMessage = message.senderId === user?.id;
+                        const isOwnMessage = message.senderId === user?.uid;
                         return (
                           <div
                             key={message.id}

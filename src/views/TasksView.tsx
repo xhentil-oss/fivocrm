@@ -119,7 +119,7 @@ const TasksView: React.FC = () => {
     const startDate = new Date(formData.get('startDate') as string);
     const endDate = new Date(formData.get('endDate') as string);
     // Default to current user if not specified
-    const assignedToUserId = (formData.get('assignedToUserId') as string) || user?.id || '';
+    const assignedToUserId = (formData.get('assignedToUserId') as string) || user?.uid || '';
     const projectId = formData.get('projectId') as string;
     const priority = formData.get('priority') as string;
     const status = formData.get('status') as string;
@@ -168,7 +168,7 @@ const TasksView: React.FC = () => {
       });
     }
 
-    if (assignedToUserId && assignedToUserId !== user?.id) {
+    if (assignedToUserId && assignedToUserId !== user?.uid) {
       await notificationMutation.create({
         userId: assignedToUserId,
         title: 'New Task Assigned',
@@ -178,7 +178,7 @@ const TasksView: React.FC = () => {
     }
 
     for (const collabId of collaboratorIds) {
-      if (collabId !== user?.id) {
+      if (collabId !== user?.uid) {
         await notificationMutation.create({
           userId: collabId,
           title: 'Added as Collaborator',
@@ -228,7 +228,7 @@ const TasksView: React.FC = () => {
     });
 
     const task = tasks.find(t => t.id === taskId);
-    if (task && task.assignedToUserId !== user?.id) {
+    if (task && task.assignedToUserId !== user?.uid) {
       await notificationMutation.create({
         userId: task.assignedToUserId,
         title: 'New Comment',

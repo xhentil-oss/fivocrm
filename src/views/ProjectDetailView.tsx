@@ -93,7 +93,7 @@ const ProjectDetailView: React.FC = () => {
     const description = formData.get('description') as string;
     const startDate = new Date(formData.get('startDate') as string || Date.now());
     const endDate = new Date(formData.get('endDate') as string || Date.now() + 7 * 24 * 60 * 60 * 1000);
-    const assignedToUserId = formData.get('assignedToUserId') as string || user?.id || '';
+    const assignedToUserId = formData.get('assignedToUserId') as string || user?.uid || '';
     const priority = formData.get('priority') as string || 'medium';
     const status = formData.get('status') as string || 'Todo';
 

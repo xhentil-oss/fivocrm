@@ -219,7 +219,7 @@ const ChatView: React.FC = () => {
             {channels.map((channel) => {
               const Icon = channel.icon;
               const chMessages = channelMessages?.filter(m => m.channelId === channel.id) || [];
-              const unreadCount = chMessages.filter(m => !m.isRead && m.senderId !== user?.id).length;
+              const unreadCount = chMessages.filter(m => !m.isRead && m.senderId !== user?.uid).length;
 
               return (
                 <button
@@ -370,7 +370,7 @@ const ChatView: React.FC = () => {
             <div className="space-y-4">
               {messages && messages.length > 0 ? (
                 messages.map((message) => {
-                  const isOwnMessage = message.senderId === user?.id;
+                  const isOwnMessage = message.senderId === user?.uid;
                   return (
                     <div
                       key={message.id}

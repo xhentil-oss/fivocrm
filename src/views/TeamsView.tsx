@@ -564,7 +564,7 @@ const AddMemberForm: React.FC<{
           placeholder="user-id ose email@example.com" 
         />
         <p className="text-xs text-muted-foreground mt-1">
-          Shkruaj ID ose email-in e përdoruesit. Për veten tënde: <code className="bg-muted px-1 rounded">{user?.id}</code>
+          Shkruaj ID ose email-in e përdoruesit. Për veten tënde: <code className="bg-muted px-1 rounded">{user?.uid}</code>
         </p>
       </div>
 

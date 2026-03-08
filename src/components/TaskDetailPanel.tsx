@@ -113,8 +113,8 @@ const TaskDetailPanel: React.FC<TaskDetailPanelProps> = ({
   // Users currently working on this task
   const activeWorkers = React.useMemo(() => {
     if (!allActiveTimeEntries) return [];
-    return allActiveTimeEntries.filter(entry => entry.taskId === task.id && entry.userId !== user?.id);
-  }, [allActiveTimeEntries, task.id, user?.id]);
+    return allActiveTimeEntries.filter(entry => entry.taskId === task.id && entry.userId !== user?.uid);
+  }, [allActiveTimeEntries, task.id, user?.uid]);
 
   // Filter team members for @mention suggestions
   const mentionSuggestions = React.useMemo(() => {
@@ -190,7 +190,7 @@ const TaskDetailPanel: React.FC<TaskDetailPanelProps> = ({
       priority: 'medium',
       startDate: new Date(),
       endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-      assignedToUserId: user?.id || '',
+      assignedToUserId: user?.uid || '',
     });
   };
 
@@ -322,11 +322,11 @@ const TaskDetailPanel: React.FC<TaskDetailPanelProps> = ({
       
       for (const mention of mentions) {
         const userId = mention.slice(1);
-        if (userId !== user?.id) {
+        if (userId !== user?.uid) {
           await notificationMutation.create({
             userId,
             title: 'Ju përmendën në një koment',
-            message: `${user?.name || 'Dikush'} ju përmendi në detyrën: ${task.title}`,
+            message: `${user?.displayName || 'Dikush'} ju përmendi në detyrën: ${task.title}`,
             isRead: false,
           });
         }
@@ -349,7 +349,7 @@ const TaskDetailPanel: React.FC<TaskDetailPanelProps> = ({
         size: file.size,
         type: file.type,
         url: URL.createObjectURL(file),
-        uploadedBy: user?.id,
+        uploadedBy: user?.uid,
         uploadedAt: new Date().toISOString(),
       };
       newAttachments.push(attachment);
@@ -538,7 +538,7 @@ const TaskDetailPanel: React.FC<TaskDetailPanelProps> = ({
                         <div className="border-t my-2" />
                         <p className="text-xs text-muted-foreground px-2 py-1">Anëtarët e ekipit</p>
                         {teamMembers
-                          .filter(m => m.userId !== user?.id)
+                          .filter(m => m.userId !== user?.uid)
                           .map(member => (
                             <button
                               key={member.id}
@@ -890,9 +890,9 @@ const TaskDetailPanel: React.FC<TaskDetailPanelProps> = ({
                 {comments.map(comment => {
                   // Get commenter info
                   const commenterMember = teamMembers?.find(m => m.userId === comment.createdByUserId);
-                  const isCurrentUser = comment.createdByUserId === user?.id;
+                  const isCurrentUser = comment.createdByUserId === user?.uid;
                   const commenterName = isCurrentUser 
-                    ? (user?.name || 'Ti') 
+                    ? (user?.displayName || 'Ti') 
                     : (commenterMember?.userId?.slice(0, 12) || comment.createdByUserId?.slice(0, 12) || 'Anonim');
                   
                   return (
@@ -916,7 +916,7 @@ const TaskDetailPanel: React.FC<TaskDetailPanelProps> = ({
             {/* Comment Input */}
             <div className="flex items-center gap-2 bg-muted/30 rounded-lg p-2">
               <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center text-xs font-medium flex-shrink-0">
-                {user?.name?.slice(0, 2).toUpperCase() || 'U'}
+                {user?.displayName?.slice(0, 2).toUpperCase() || 'U'}
               </div>
               <Input
                 placeholder="Shto koment..."
