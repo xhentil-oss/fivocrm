@@ -38,10 +38,13 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, mobileOpen, onCloseMobile 
   const permissions = usePermissions();
 
   // Filter nav items based on user permissions
-  const navItems = allNavItems.filter(item => {
-    const permKey = item.permissionKey as keyof typeof permissions;
-    return permissions[permKey] === true;
-  });
+  // While loading, show all items to avoid empty menu
+  const navItems = permissions.isLoading 
+    ? allNavItems 
+    : allNavItems.filter(item => {
+        const permKey = item.permissionKey as keyof typeof permissions;
+        return permissions[permKey] === true;
+      });
 
   return (
     <>
