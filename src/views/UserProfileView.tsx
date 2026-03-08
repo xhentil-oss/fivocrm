@@ -65,7 +65,7 @@ interface UserProfileViewProps {
 }
 
 const UserProfileView: React.FC<UserProfileViewProps> = ({ userId }) => {
-  const { user: currentUser } = useAuth({ requireAuth: true });
+  const { user: currentUser } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [skills, setSkills] = useState<string[]>([]);
   const [newSkill, setNewSkill] = useState('');

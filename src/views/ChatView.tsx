@@ -45,7 +45,7 @@ type TeamMember = {
 type ChatMode = 'channel' | 'direct';
 
 const ChatView: React.FC = () => {
-  const { user } = useAuth({ requireAuth: true });
+  const { user } = useAuth();
   const { toast } = useToast();
   const [messageText, setMessageText] = useState('');
   const [chatMode, setChatMode] = useState<ChatMode>('channel');

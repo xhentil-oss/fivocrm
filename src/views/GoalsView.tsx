@@ -16,7 +16,7 @@ import { Calendar as CalendarComponent } from '../components/ui/calendar';
 import type { Goal, Team, Milestone } from '../types';
 
 const GoalsView: React.FC = () => {
-  const { user } = useAuth({ requireAuth: true });
+  const { user } = useAuth();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [selectedGoal, setSelectedGoal] = useState<Goal | null>(null);
   const [filterStatus, setFilterStatus] = useState<string>('all');

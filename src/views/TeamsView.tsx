@@ -22,7 +22,7 @@ import ExportButton from '../components/ExportButton';
 import type { Team, TeamMember, TeamInvite } from '../types';
 
 const TeamsView: React.FC = () => {
-  const { user } = useAuth({ requireAuth: true });
+  const { user } = useAuth();
   const permissions = usePermissions();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [selectedTeam, setSelectedTeam] = useState<Team | null>(null);

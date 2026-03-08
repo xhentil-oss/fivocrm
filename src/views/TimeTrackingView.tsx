@@ -15,7 +15,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs'
 import type { TimeEntry, Task, Project } from '../types';
 
 const TimeTrackingView: React.FC = () => {
-  const { user } = useAuth({ requireAuth: true });
+  const { user } = useAuth();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [selectedEntry, setSelectedEntry] = useState<TimeEntry | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);

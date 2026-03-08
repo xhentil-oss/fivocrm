@@ -24,7 +24,7 @@ import type { Task, TaskComment, Project, Notification, TaskCollaborator, UserPr
 import TaskDetailPanel from '../components/TaskDetailPanel';
 
 const TasksView: React.FC = () => {
-  const { user } = useAuth({ requireAuth: true });
+  const { user } = useAuth();
   const [viewMode, setViewMode] = useState<'board' | 'calendar' | 'list'>('list');
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');

@@ -27,7 +27,7 @@ import type { Task, Project, Team, TeamMember } from '../types';
 const ProjectDetailView: React.FC = () => {
   const { projectId } = useParams<{ projectId: string }>();
   const navigate = useNavigate();
-  const { user } = useAuth({ requireAuth: true });
+  const { user } = useAuth();
   
   const [viewMode, setViewMode] = useState<'list' | 'board' | 'calendar'>('list');
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
