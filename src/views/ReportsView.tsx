@@ -7,24 +7,24 @@ import type { Invoice, Project, Team, Expense, Service, InvoiceItem } from '../t
 
 const ReportsView: React.FC = () => {
   // Fetch all invoices
-  const { data: invoices, isPending: invoicesLoading } = useQuery('Invoice', {
-    orderBy: { createdAt: 'desc' },
+  const { data: invoices, loading: invoicesLoading } = useCollection<Invoice>('invoices', {
+    orderBy: { field: 'createdAt', direction: 'desc' },
   });
 
   // Fetch all projects
-  const { data: projects, isPending: projectsLoading } = useQuery('Project');
+  const { data: projects, loading: projectsLoading } = useCollection<Project>('projects');
 
   // Fetch all teams
-  const { data: teams, isPending: teamsLoading } = useQuery('Team');
+  const { data: teams, loading: teamsLoading } = useCollection<Team>('teams');
 
   // Fetch all expenses
-  const { data: expenses, isPending: expensesLoading } = useQuery('Expense');
+  const { data: expenses, loading: expensesLoading } = useCollection<Expense>('expenses');
 
   // Fetch all services
-  const { data: services } = useQuery('Service');
+  const { data: services } = useCollection<Service>('services');
 
   // Fetch all invoice items
-  const { data: invoiceItems } = useQuery('InvoiceItem');
+  const { data: invoiceItems } = useCollection<InvoiceItem>('invoiceItems');
 
   // Calculate revenue by department based on services in invoices
   const revenueByDepartment = useMemo(() => {
