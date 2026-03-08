@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, Link } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import ErrorBoundary from './components/ErrorBoundary';
 import TopNavBar from './components/TopNavBar';
 import Sidebar from './components/Sidebar';
 import LoginView from './views/LoginView';
@@ -91,24 +92,35 @@ function AppContent() {
                 style={{ marginTop: '72px' }}
               >
                 <div className="p-6 lg:p-8">
-                  <Routes>
-                    <Route path="/" element={<Navigate to="/app/reports" replace />} />
-                    <Route path="/app/projects" element={<ProjectsView />} />
-                    <Route path="/app/projects/:projectId" element={<ProjectDetailView />} />
-                    <Route path="/app/crm" element={<CRMView />} />
-                    <Route path="/app/tasks" element={<TasksView />} />
-                    <Route path="/app/goals" element={<GoalsView />} />
-                    <Route path="/app/teams" element={<TeamsView />} />
-                    <Route path="/app/invoices" element={<InvoicesView />} />
-                    <Route path="/app/chat" element={<ChatView />} />
-                    <Route path="/app/reports" element={<ReportsView />} />
-                    <Route path="/app/profile" element={<UserProfileView />} />
-                    <Route path="/app/customers" element={<CustomersView />} />
-                    <Route path="/app/services" element={<ServicesView />} />
-                    <Route path="/app/expenses" element={<ExpensesView />} />
-                    <Route path="/app/time-tracking" element={<TimeTrackingView />} />
-                    <Route path="/app/settings" element={<SettingsView />} />
-                  </Routes>
+                  <ErrorBoundary>
+                    <Routes>
+                      <Route path="/" element={<Navigate to="/app/reports" replace />} />
+                      <Route path="/app/projects" element={<ProjectsView />} />
+                      <Route path="/app/projects/:projectId" element={<ProjectDetailView />} />
+                      <Route path="/app/crm" element={<CRMView />} />
+                      <Route path="/app/tasks" element={<TasksView />} />
+                      <Route path="/app/goals" element={<GoalsView />} />
+                      <Route path="/app/teams" element={<TeamsView />} />
+                      <Route path="/app/invoices" element={<InvoicesView />} />
+                      <Route path="/app/chat" element={<ChatView />} />
+                      <Route path="/app/reports" element={<ReportsView />} />
+                      <Route path="/app/profile" element={<UserProfileView />} />
+                      <Route path="/app/customers" element={<CustomersView />} />
+                      <Route path="/app/services" element={<ServicesView />} />
+                      <Route path="/app/expenses" element={<ExpensesView />} />
+                      <Route path="/app/time-tracking" element={<TimeTrackingView />} />
+                      <Route path="/app/settings" element={<SettingsView />} />
+                      <Route path="*" element={
+                      <div className="text-center py-20">
+                        <h1 className="text-4xl font-bold text-foreground mb-4">404</h1>
+                        <p className="text-muted-foreground mb-6">Faqja nuk u gjet</p>
+                        <Link to="/app/reports" className="text-primary hover:underline">
+                          Kthehu në dashboard
+                        </Link>
+                      </div>
+                    } />
+                    </Routes>
+                  </ErrorBoundary>
                 </div>
               </main>
             </div>
@@ -128,11 +140,13 @@ function AppContent() {
 
 function App() {
   return (
-    <Router>
-      <AuthProvider>
-        <AppContent />
-      </AuthProvider>
-    </Router>
+    <ErrorBoundary>
+      <Router>
+        <AuthProvider>
+          <AppContent />
+        </AuthProvider>
+      </Router>
+    </ErrorBoundary>
   );
 }
 
