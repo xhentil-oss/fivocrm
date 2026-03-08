@@ -321,34 +321,34 @@ const TasksView: React.FC = () => {
   }
 
   return (
-    <div className="h-[calc(100vh-120px)] flex">
+    <div className="h-[calc(100vh-120px)] flex flex-col lg:flex-row">
       {/* Left Side - Task List */}
-      <div className={`${selectedTask ? 'w-1/2 border-r' : 'w-full'} flex flex-col transition-all duration-300`}>
+      <div className={`${selectedTask ? 'hidden lg:flex lg:w-1/2 lg:border-r' : 'w-full'} flex flex-col transition-all duration-300`}>
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border-b gap-3">
           <div>
-            <h1 className="text-xl font-semibold text-foreground">Detyrat e Mia</h1>
-            <p className="text-sm text-muted-foreground">
+            <h1 className="text-lg sm:text-xl font-semibold text-foreground">Detyrat e Mia</h1>
+            <p className="text-xs sm:text-sm text-muted-foreground">
               {tasks.length} detyra · {myTasks.length} të caktuara për ty
             </p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <Tabs value={viewMode} onValueChange={(v) => setViewMode(v as any)}>
               <TabsList className="h-8">
-                <TabsTrigger value="list" className="text-xs px-2"><List className="w-3 h-3 mr-1" />List</TabsTrigger>
-                <TabsTrigger value="board" className="text-xs px-2"><LayoutGrid className="w-3 h-3 mr-1" />Board</TabsTrigger>
-                <TabsTrigger value="calendar" className="text-xs px-2"><CalendarDays className="w-3 h-3 mr-1" />Calendar</TabsTrigger>
+                <TabsTrigger value="list" className="text-xs px-2"><List className="w-3 h-3 sm:mr-1" /><span className="hidden sm:inline">List</span></TabsTrigger>
+                <TabsTrigger value="board" className="text-xs px-2"><LayoutGrid className="w-3 h-3 sm:mr-1" /><span className="hidden sm:inline">Board</span></TabsTrigger>
+                <TabsTrigger value="calendar" className="text-xs px-2"><CalendarDays className="w-3 h-3 sm:mr-1" /><span className="hidden sm:inline">Calendar</span></TabsTrigger>
               </TabsList>
             </Tabs>
 
             <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
               <DialogTrigger asChild>
                 <Button size="sm" className="bg-primary text-primary-foreground">
-                  <Plus className="w-4 h-4 mr-1" />
-                  Detyrë e Re
+                  <Plus className="w-4 h-4 sm:mr-1" />
+                  <span className="hidden sm:inline">Detyrë e Re</span>
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-2xl">
+              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle>Krijo Detyrë të Re</DialogTitle>
                 </DialogHeader>
@@ -359,8 +359,8 @@ const TasksView: React.FC = () => {
         </div>
 
         {/* Search and Filter Bar */}
-        <div className="px-4 py-2 border-b bg-muted/30 flex items-center gap-3">
-          <div className="relative flex-1 max-w-xs">
+        <div className="px-4 py-2 border-b bg-muted/30 flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
+          <div className="relative flex-1">
             <input
               type="text"
               placeholder="Kërko detyra..."
@@ -427,8 +427,8 @@ const TasksView: React.FC = () => {
                         {task.title}
                       </span>
                     </div>
-                    {/* Assignee */}
-                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                    {/* Assignee - hide on small mobile */}
+                    <div className="hidden sm:flex items-center gap-1.5 text-xs text-muted-foreground">
                       <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center">
                         <User className="w-3 h-3 text-primary" />
                       </div>
@@ -440,7 +440,7 @@ const TasksView: React.FC = () => {
                           : 'Pa caktuar'}
                       </span>
                     </div>
-                    <span className={`text-xs ${dateInfo.className}`}>
+                    <span className={`text-xs whitespace-nowrap ${dateInfo.className}`}>
                       {dateInfo.text}
                     </span>
                   </div>
@@ -463,14 +463,14 @@ const TasksView: React.FC = () => {
           )}
 
           {viewMode === 'board' && (
-            <div className="grid grid-cols-4 gap-4 p-4 h-full">
+            <div className="flex gap-4 p-4 h-full overflow-x-auto">
               {columns.map((column) => {
                 const columnTasks = tasks.filter(task => task.status === column.status);
                 
                 return (
                   <div 
                     key={column.id} 
-                    className="flex flex-col"
+                    className="flex flex-col min-w-[280px] sm:min-w-[300px] flex-shrink-0"
                     onDragOver={handleDragOver}
                     onDrop={(e) => handleDrop(e, column.status)}
                   >
@@ -514,7 +514,7 @@ const TasksView: React.FC = () => {
 
       {/* Right Side - Task Detail Panel */}
       {selectedTask && (
-        <div className="w-1/2 h-full">
+        <div className="fixed inset-0 z-50 bg-background lg:relative lg:inset-auto lg:z-auto lg:w-1/2 h-full">
           <TaskDetailPanel
             task={selectedTask}
             onClose={() => setSelectedTask(null)}
@@ -581,7 +581,7 @@ const TaskForm: React.FC<{
         <Textarea id="description" name="description" defaultValue={initialData?.description} placeholder="Përshkruaj detyrën..." rows={3} />
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <Label>Data e Fillimit</Label>
           <Popover>
@@ -623,7 +623,7 @@ const TaskForm: React.FC<{
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <Label htmlFor="status">Statusi</Label>
           <Select value={status} onValueChange={setStatus}>
