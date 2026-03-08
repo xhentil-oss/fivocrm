@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useQuery, useMutation, useAuth } from '@animaapp/playground-react-sdk';
+import { useCollection, useMutation } from '../hooks/useFirestore';
+import { useAuth } from '../contexts/AuthContext';
 import { Search, Plus, List, Users, ChevronDown, MoreVertical, Folder, Star, StarOff } from 'lucide-react';
 import { Card } from '../components/ui/card';
 import { Button } from '../components/ui/button';
@@ -18,11 +19,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '../components/ui/dropdown-menu';
-import type { Project, Team, TeamMember, Task } from '@animaapp/playground-react-sdk';
+import type { Project, Team, TeamMember, Task } from '../types';
 
 const ProjectsView: React.FC = () => {
   const navigate = useNavigate();
-  const { user } = useAuth({ requireAuth: true });
+  const { user } = useAuth();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   
@@ -32,16 +33,17 @@ const ProjectsView: React.FC = () => {
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [filterMembers, setFilterMembers] = useState<string[]>([]);
 
-  const { data: projects, isPending: projectsLoading } = useQuery('Project', {
-    orderBy: { updatedAt: 'desc' }
+  // Firebase hooks
+  const { data: projects, loading: projectsLoading } = useCollection<Project>('projects', {
+    orderBy: { field: 'updatedAt', direction: 'desc' }
   });
-  const { data: teams } = useQuery('Team');
-  const { data: teamMembers } = useQuery('TeamMember', {
-    where: { status: 'Active' }
+  const { data: teams } = useCollection<Team>('teams');
+  const { data: teamMembers } = useCollection<TeamMember>('teamMembers', {
+    where: [{ field: 'status', operator: '==', value: 'Active' }]
   });
-  const { data: tasks } = useQuery('Task');
+  const { data: tasks } = useCollection<Task>('tasks');
   
-  const projectMutation = useMutation('Project');
+  const projectMutation = useMutation<Project>('projects');
 
   // Get unique owners from projects
   const owners = React.useMemo(() => {
@@ -195,8 +197,8 @@ const ProjectsView: React.FC = () => {
               </button>
               {user && (
                 <button
-                  className={`w-full text-left px-2 py-1.5 text-sm rounded hover:bg-muted ${filterOwner === user.id ? 'bg-muted' : ''}`}
-                  onClick={() => setFilterOwner(user.id)}
+                  className={`w-full text-left px-2 py-1.5 text-sm rounded hover:bg-muted ${filterOwner === user.uid ? 'bg-muted' : ''}`}
+                  onClick={() => setFilterOwner(user.uid)}
                 >
                   Unë
                 </button>
@@ -330,7 +332,7 @@ const ProjectsView: React.FC = () => {
             const members = getProjectMembers(project);
             const team = getTeamName(project.teamId);
             const projectTasks = tasks?.filter(t => t.projectId === project.id) || [];
-            const isJoined = members.some(m => m.userId === user?.id);
+            const isJoined = members.some(m => m.userId === user?.uid);
             
             return (
               <div
