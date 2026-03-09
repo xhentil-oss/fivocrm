@@ -13,19 +13,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   // Konfiguro SMTP transporter
+  const smtpUser = process.env.SMTP_USER || 'crm@fivoo.net';
   const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST || 'mail.fivoo.net',        // p.sh. smtp.gmail.com
+    host: process.env.SMTP_HOST || 'mail.fivoo.net',
     port: Number(process.env.SMTP_PORT) || 465,
-    secure: process.env.SMTP_SECURE === 'true', // true për port 465
+    secure: true, // true për port 465 (SSL)
     auth: {
-      user: process.env.SMTP_USER || 'crm@fivoo.net',      // email juaj
-      pass: process.env.SMTP_PASS || 'Vercel@2024@',      // password ose app password
+      user: smtpUser,
+      pass: process.env.SMTP_PASS || 'Vercel@2024@',
     },
   });
 
   try {
     await transporter.sendMail({
-      from: `"${senderName || 'FivoCRM'}" <${process.env.SMTP_USER}>`,
+      from: `"${senderName || 'FivoCRM'}" <${smtpUser}>`,
       to,
       subject: `Ftesë për tu bashkuar me ekipin "${teamName}"`,
       html: `
