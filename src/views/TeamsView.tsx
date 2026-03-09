@@ -84,8 +84,30 @@ const TeamsView: React.FC = () => {
       status: 'Pending',
     });
 
-    // In a real app, you would send an email here
-    alert(`Invitation sent to ${email}! (In production, an email would be sent)`);
+    // Send invitation email via API
+    try {
+      const inviteLink = `${window.location.origin}/join/${token}`;
+      const response = await fetch('/api/send-invite', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          to: email,
+          teamName: selectedTeam.name,
+          inviteLink,
+          senderName: user.displayName || 'FivoCRM'
+        })
+      });
+      
+      if (response.ok) {
+        alert(`Ftesa u dërgua me sukses te ${email}!`);
+      } else {
+        alert(`Ftesa u ruajt, por email-i nuk u dërgua. Kontrolloni konfigurimin SMTP.`);
+      }
+    } catch (error) {
+      console.error('Email error:', error);
+      alert(`Ftesa u ruajt, por email-i nuk u dërgua. Gabim: ${error}`);
+    }
+    
     setIsInviteDialogOpen(false);
   };
 
