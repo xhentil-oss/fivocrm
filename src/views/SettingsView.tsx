@@ -1,17 +1,121 @@
 import React, { useState } from 'react';
-import { User, Bell, Lock, Palette, Globe, CreditCard, Key, ExternalLink, CheckCircle2, AlertCircle } from 'lucide-react';
+import { User, Bell, Lock, Palette, Globe, CreditCard, Key, ExternalLink, CheckCircle2, AlertCircle, Clock, RefreshCw, Play, Zap } from 'lucide-react';
 import { Card } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Switch } from '../components/ui/switch';
 import { Separator } from '../components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 
+// ─── CronJobCard sub-component ───────────────────────────────────────────────
+interface CronJobCardProps {
+  title: string;
+  description: string;
+  schedule: string;
+  icon: React.ReactNode;
+  enabled: boolean;
+  onToggle: (val: boolean) => void;
+  status?: string;
+  onRun: () => void;
+  lastRun?: { time: string; result: any };
+}
+
+const CronJobCard: React.FC<CronJobCardProps> = ({
+  title, description, schedule, icon, enabled, onToggle, status, onRun, lastRun,
+}) => (
+  <Card className="p-6 space-y-4">
+    <div className="flex items-start justify-between gap-4">
+      <div className="flex items-start gap-3">
+        <div className="p-2 bg-muted rounded-lg shrink-0">{icon}</div>
+        <div>
+          <h3 className="font-semibold text-foreground">{title}</h3>
+          <p className="text-sm text-muted-foreground mt-1">{description}</p>
+        </div>
+      </div>
+      <Switch checked={enabled} onCheckedChange={onToggle} />
+    </div>
+    <Separator />
+    <div className="flex items-center justify-between gap-4 flex-wrap">
+      <div className="flex items-center gap-4 flex-wrap">
+        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+          <Clock className="w-3 h-3" />
+          <span>{schedule}</span>
+        </div>
+        {lastRun && (
+          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+            <CheckCircle2 className="w-3 h-3 text-success" />
+            <span>Fundit: {new Date(lastRun.time).toLocaleString('sq-AL')}</span>
+            {lastRun.result && (
+              <span className="text-success">
+                ({Object.entries(lastRun.result)
+                  .filter(([k]) => k !== 'success' && k !== 'timestamp')
+                  .map(([k, v]) => `${k}: ${v}`)
+                  .join(', ')})
+              </span>
+            )}
+          </div>
+        )}
+      </div>
+      <Button
+        size="sm"
+        variant="outline"
+        className="gap-1.5 min-w-[138px]"
+        onClick={onRun}
+        disabled={status === 'running' || !enabled}
+      >
+        {status === 'running' ? (
+          <><RefreshCw className="w-3 h-3 animate-spin" />Duke ekzekutuar...</>
+        ) : status === 'success' ? (
+          <><CheckCircle2 className="w-3 h-3 text-success" />U krye!</>
+        ) : status === 'error' ? (
+          <><AlertCircle className="w-3 h-3 text-destructive" />Gabim</>        ) : (
+          <><Play className="w-3 h-3" />Ekzekuto Tani</>
+        )}
+      </Button>
+    </div>
+  </Card>
+);
+
+// ─── SettingsView ──────────────────────────────────────────────────────────────
 const SettingsView: React.FC = () => {
   const [stripePublishableKey, setStripePublishableKey] = useState('');
   const [stripeSecretKey, setStripeSecretKey] = useState('');
   const [stripeWebhookSecret, setStripeWebhookSecret] = useState('');
   const [stripeMode, setStripeMode] = useState<'test' | 'live'>('test');
   const [stripeSaved, setStripeSaved] = useState(false);
+
+  // ── Cron / Automation settings (persisted in localStorage) ──
+  const [cronSettings, setCronSettings] = useState<Record<string, any>>(() => {
+    try { return JSON.parse(localStorage.getItem('cron_settings') || '{}'); } catch { return {}; }
+  });
+  const [cronRunStatus, setCronRunStatus] = useState<Record<string, string>>({});
+
+  const getLastRun = (key: string) => {
+    try { return JSON.parse(localStorage.getItem('cron_last_runs') || '{}')[key]; } catch { return undefined; }
+  };
+
+  const handleRunCron = async (path: string, key: string) => {
+    setCronRunStatus(prev => ({ ...prev, [key]: 'running' }));
+    try {
+      const response = await fetch(path);
+      const data = await response.json();
+      if (response.ok) {
+        setCronRunStatus(prev => ({ ...prev, [key]: 'success' }));
+        const runs = JSON.parse(localStorage.getItem('cron_last_runs') || '{}');
+        localStorage.setItem('cron_last_runs', JSON.stringify({ ...runs, [key]: { time: new Date().toISOString(), result: data } }));
+      } else {
+        setCronRunStatus(prev => ({ ...prev, [key]: 'error' }));
+      }
+    } catch {
+      setCronRunStatus(prev => ({ ...prev, [key]: 'error' }));
+    }
+    setTimeout(() => setCronRunStatus(prev => ({ ...prev, [key]: 'idle' })), 4000);
+  };
+
+  const handleToggleCron = (key: string, value: boolean) => {
+    const updated = { ...cronSettings, [key]: { ...(cronSettings[key] || {}), enabled: value } };
+    setCronSettings(updated);
+    localStorage.setItem('cron_settings', JSON.stringify(updated));
+  };
 
   const handleSaveStripeSettings = () => {
     // Në një aplikacion real, këto do të ruheshin në backend
@@ -53,6 +157,10 @@ const SettingsView: React.FC = () => {
           <TabsTrigger value="integrations" className="data-[state=active]:bg-background data-[state=active]:text-primary">
             <CreditCard className="w-4 h-4 mr-2" />
             Integrimet
+          </TabsTrigger>
+          <TabsTrigger value="automation" className="data-[state=active]:bg-background data-[state=active]:text-primary">
+            <Zap className="w-4 h-4 mr-2" />
+            Automatizimi
           </TabsTrigger>
         </TabsList>
 
@@ -442,6 +550,92 @@ const SettingsView: React.FC = () => {
                   <p className="text-xs text-muted-foreground">Së shpejti...</p>
                 </div>
               </div>
+            </div>
+          </Card>
+        </TabsContent>
+        <TabsContent value="automation" className="space-y-6">
+          {/* Info banner */}
+          <div className="p-4 bg-primary/5 border border-primary/20 rounded-lg flex items-start gap-3">
+            <Zap className="w-5 h-5 text-primary mt-0.5 shrink-0" />
+            <div>
+              <p className="font-medium text-foreground">Punë të Automatizuara (Cron Jobs)</p>
+              <p className="text-sm text-muted-foreground mt-1">
+                Këto procese ekzekutohen automatikisht çdo ditë nga Vercel. Mund t&apos;i testosh
+                manualisht me butonin &quot;Ekzekuto Tani&quot;. Kërkon konfigurimin e variablave
+                të mjedisit Firebase tek Vercel.
+              </p>
+            </div>
+          </div>
+
+          {/* Task Deadline Alerts */}
+          <CronJobCard
+            title="Njoftime Afatesh për Detyra"
+            description="Çdo mëngjes kontrollon detyrat që skadojnë brenda 2 ditëve dhe dërgon njoftime email + in-app te anëtarët e caktuar. Shënon detyrën si të njoftuar për të shmangur dyfishimet."
+            schedule="Çdo ditë në 08:00 UTC"
+            icon={<Clock className="w-5 h-5 text-primary" />}
+            enabled={cronSettings['task_alerts']?.enabled ?? true}
+            onToggle={(v) => handleToggleCron('task_alerts', v)}
+            status={cronRunStatus['task_alerts']}
+            onRun={() => handleRunCron('/api/cron/task-deadline-alerts', 'task_alerts')}
+            lastRun={getLastRun('task_alerts')}
+          />
+
+          {/* Invoice Reminders */}
+          <CronJobCard
+            title="Reminders & Overdue Faturash"
+            description="Çdo mëngjes shënon automatikisht faturat e kaluara afatit si 'Overdue' dhe dërgon kujtesë pagese me email tek klientët me fatura që skadojnë brenda 3 ditëve."
+            schedule="Çdo ditë në 09:00 UTC"
+            icon={<CreditCard className="w-5 h-5 text-warning" />}
+            enabled={cronSettings['invoice_reminders']?.enabled ?? true}
+            onToggle={(v) => handleToggleCron('invoice_reminders', v)}
+            status={cronRunStatus['invoice_reminders']}
+            onRun={() => handleRunCron('/api/cron/invoice-reminders', 'invoice_reminders')}
+            lastRun={getLastRun('invoice_reminders')}
+          />
+
+          {/* Recurring Tasks */}
+          <CronJobCard
+            title="Detyra Periodike"
+            description="Çdo mesnatë krijon automatikisht kopje të reja për detyrat periodike (javore, mujore, vjetore) kur mbërin data e planifikuar, dhe dërgon njoftim te anëtari i caktuar."
+            schedule="Çdo ditë në 00:00 UTC"
+            icon={<RefreshCw className="w-5 h-5 text-success" />}
+            enabled={cronSettings['recurring_tasks']?.enabled ?? true}
+            onToggle={(v) => handleToggleCron('recurring_tasks', v)}
+            status={cronRunStatus['recurring_tasks']}
+            onRun={() => handleRunCron('/api/cron/recurring-tasks', 'recurring_tasks')}
+            lastRun={getLastRun('recurring_tasks')}
+          />
+
+          {/* Environment Variables Setup Guide */}
+          <Card className="p-6 space-y-4">
+            <h3 className="text-h4 text-foreground flex items-center gap-2">
+              <Key className="w-4 h-4" />
+              Konfigurimi i Vercel Environment Variables
+            </h3>
+            <p className="text-sm text-muted-foreground">
+              Shto këto variabla në{' '}
+              <strong>Vercel Dashboard → Project → Settings → Environment Variables</strong>:
+            </p>
+            <div className="space-y-2">
+              {([
+                ['FIREBASE_PROJECT_ID',    'ID e projektit Firebase (p.sh. my-project-123)'],
+                ['FIREBASE_CLIENT_EMAIL',  'Email i Firebase Service Account'],
+                ['FIREBASE_PRIVATE_KEY',   'Çelësi privat i Service Account (fillon me -----BEGIN)'],
+                ['CRON_SECRET',            'Fjalëkalim sekret — Vercel e vendos automatikisht'],
+              ] as [string, string][]).map(([key, desc]) => (
+                <div key={key} className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
+                  <code className="text-xs font-mono text-primary bg-primary/10 px-2 py-1 rounded shrink-0">{key}</code>
+                  <span className="text-xs text-muted-foreground">{desc}</span>
+                </div>
+              ))}
+            </div>
+            <div className="flex items-start gap-2 p-3 bg-info/10 border border-info/20 rounded-lg">
+              <AlertCircle className="w-4 h-4 text-info shrink-0 mt-0.5" />
+              <p className="text-xs text-info">
+                Për të marrë Firebase credentials:{' '}
+                <strong>Firebase Console → Project Settings → Service Accounts → Generate new private key</strong>.
+                Shkarko JSON-in dhe kopjo fushat përkatëse.
+              </p>
             </div>
           </Card>
         </TabsContent>
