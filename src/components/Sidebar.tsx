@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { FolderKanban, Users, CheckSquare, BarChart3, Settings, UsersRound, Receipt, MessageSquare, Target, UserCircle, DollarSign, Clock, Shield } from 'lucide-react';
+import { FolderKanban, Users, CheckSquare, BarChart3, Settings, UsersRound, Receipt, MessageSquare, Target, UserCircle, DollarSign, Clock, Shield, Globe } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { usePermissions } from '../hooks/usePermissions';
 import { Badge } from './ui/badge';
@@ -31,6 +31,7 @@ const allNavItems: NavItem[] = [
   { path: '/app/time-tracking', label: 'Koha', icon: Clock, permissionKey: 'canAccessTimeTracking' },
   { path: '/app/chat', label: 'Chat', icon: MessageSquare, permissionKey: 'canAccessChat' },
   { path: '/app/reports', label: 'Raportet', icon: BarChart3, permissionKey: 'canAccessReports' },
+  { path: '/app/client-portal', label: 'Portali Klientëve', icon: Globe, permissionKey: 'canAccessCRM' },
   { path: '/app/profile', label: 'Profili', icon: UserCircle, permissionKey: 'canAccessProfile' },
   { path: '/app/settings', label: 'Cilësimet', icon: Settings, permissionKey: 'canAccessSettings' },
 ];

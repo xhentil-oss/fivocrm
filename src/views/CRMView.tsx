@@ -15,7 +15,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { Textarea } from '../components/ui/textarea';
 import DetailDrawer from '../components/DetailDrawer';
-import type { Lead } from '../types';
+import type { Lead, ClientPortalAccess } from '../types';
 
 const CRMView: React.FC = () => {
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
@@ -30,6 +30,7 @@ const CRMView: React.FC = () => {
   const leadMutation = useMutation<Lead>('leads');
   const customerMutation = useMutation<Customer>('customers');
   const notificationMutation = useMutation<Notification>('notifications');
+  const portalAccessMutation = useMutation<ClientPortalAccess>('clientPortalAccess');
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -93,9 +94,9 @@ const CRMView: React.FC = () => {
     // Update lead status
     await leadMutation.update(lead.id, { status: newStatus });
 
-    // If status is "Converted", create a customer
+    // If status is "Converted", create a customer + portal access
     if (newStatus === 'Converted') {
-      await customerMutation.create({
+      const customerDoc = await customerMutation.create({
         name: lead.name,
         email: lead.email,
         phone: lead.phoneNumber,
@@ -105,6 +106,16 @@ const CRMView: React.FC = () => {
         notes: lead.notes,
         status: 'Active',
       });
+
+      // Auto-create client portal access if customer has an email
+      if (lead.email && customerDoc?.id) {
+        await portalAccessMutation.create({
+          customerId: customerDoc.id,
+          userId: '', // Will be linked when client registers/logs in
+          email: lead.email,
+          status: 'Active',
+        });
+      }
 
       // Send notification
       if (user) {

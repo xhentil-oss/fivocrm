@@ -9,7 +9,7 @@ import { Badge } from '../components/ui/badge';
 import { Separator } from '../components/ui/separator';
 import { Send, MessageSquare, Users, Hash, Paperclip, X, FileIcon, User, Circle } from 'lucide-react';
 import { useToast } from '../hooks/use-toast';
-import type { ChatMessage, Channel, UserProfile } from '../types';
+import type { ChatMessage, Channel, UserProfile, Customer, ClientPortalAccess } from '../types';
 
 type Message = {
   id: string;
@@ -49,7 +49,7 @@ const ChatView: React.FC = () => {
   const { toast } = useToast();
   const [messageText, setMessageText] = useState('');
   const [chatMode, setChatMode] = useState<ChatMode>('channel');
-  const [activeChannel, setActiveChannel] = useState<'general' | 'team' | 'support'>('general');
+  const [activeChannel, setActiveChannel] = useState<string>('general');
   const [activeDirectUserId, setActiveDirectUserId] = useState<string | null>(null);
   const [attachmentUrl, setAttachmentUrl] = useState('');
   const [showAttachmentInput, setShowAttachmentInput] = useState(false);
@@ -59,6 +59,12 @@ const ChatView: React.FC = () => {
   const { data: teamMembers } = useCollection<any>('teamMembers', {
     where: [{ field: 'status', operator: '==', value: 'Active' }],
   });
+
+  // Fetch client portal access for client channels
+  const { data: portalAccess } = useCollection<ClientPortalAccess>('clientPortalAccess', {
+    where: [{ field: 'status', operator: '==', value: 'Active' }],
+  });
+  const { data: customers } = useCollection<Customer>('customers');
 
   // Fetch messages for the active channel
   const { data: channelMessages, loading: channelPending, error: channelError } = useCollection<ChatMessage>('messages', {
@@ -158,7 +164,7 @@ const ChatView: React.FC = () => {
     }
   };
 
-  const handleSelectChannel = (channelId: 'general' | 'team' | 'support') => {
+  const handleSelectChannel = (channelId: string) => {
     setChatMode('channel');
     setActiveChannel(channelId);
     setActiveDirectUserId(null);
@@ -254,6 +260,58 @@ const ChatView: React.FC = () => {
 
           <Separator className="my-2" />
 
+          {/* Client Channels */}
+          {portalAccess && portalAccess.length > 0 && (
+            <>
+              <CardHeader className="pt-2 pb-2">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <MessageSquare className="h-4 w-4" />
+                  Kanale Klientësh
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2 pb-2">
+                {portalAccess.map((access) => {
+                  const customer = customers?.find(c => c.id === access.customerId);
+                  const clientChannelId = `client-${access.customerId}`;
+                  const clientMsgs = allDirectMessages?.filter(m => m.channelId === clientChannelId) || [];
+                  const unread = clientMsgs.filter(m => !m.isRead && m.senderId !== user?.uid).length;
+
+                  return (
+                    <button
+                      key={access.id}
+                      onClick={() => handleSelectChannel(clientChannelId)}
+                      className={`w-full flex items-start gap-3 p-3 rounded-lg transition-colors text-left ${
+                        chatMode === 'channel' && activeChannel === clientChannelId
+                          ? 'bg-primary text-primary-foreground'
+                          : 'hover:bg-accent'
+                      }`}
+                    >
+                      <Users className="h-5 w-5 mt-0.5 flex-shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="font-medium truncate text-sm">
+                            {customer?.name || access.email}
+                          </span>
+                          {unread > 0 && (
+                            <Badge variant="destructive" className="h-5 min-w-5 px-1.5">
+                              {unread}
+                            </Badge>
+                          )}
+                        </div>
+                        <p className={`text-xs mt-0.5 truncate ${
+                          chatMode === 'channel' && activeChannel === clientChannelId ? 'text-primary-foreground/80' : 'text-muted-foreground'
+                        }`}>
+                          {customer?.company || access.email}
+                        </p>
+                      </div>
+                    </button>
+                  );
+                })}
+              </CardContent>
+              <Separator className="my-2" />
+            </>
+          )}
+
           <CardHeader className="pt-2 pb-2">
             <CardTitle className="text-lg flex items-center gap-2">
               <User className="h-4 w-4" />
@@ -342,12 +400,28 @@ const ChatView: React.FC = () => {
             <div className="flex items-center gap-2">
               {chatMode === 'channel' ? (
                 <>
-                  {React.createElement(channels.find(c => c.id === activeChannel)?.icon || Hash, {
-                    className: 'h-5 w-5'
-                  })}
-                  <CardTitle className="text-lg">
-                    {channels.find(c => c.id === activeChannel)?.name}
-                  </CardTitle>
+                  {activeChannel.startsWith('client-') ? (
+                    <>
+                      <Users className="h-5 w-5" />
+                      <CardTitle className="text-lg">
+                        {(() => {
+                          const custId = activeChannel.replace('client-', '');
+                          const customer = customers?.find(c => c.id === custId);
+                          return customer?.name || 'Klient';
+                        })()}
+                      </CardTitle>
+                      <Badge variant="secondary" className="text-xs">Klient</Badge>
+                    </>
+                  ) : (
+                    <>
+                      {React.createElement(channels.find(c => c.id === activeChannel)?.icon || Hash, {
+                        className: 'h-5 w-5'
+                      })}
+                      <CardTitle className="text-lg">
+                        {channels.find(c => c.id === activeChannel)?.name}
+                      </CardTitle>
+                    </>
+                  )}
                 </>
               ) : (
                 <>

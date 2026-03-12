@@ -252,3 +252,35 @@ export interface Notification {
   read?: boolean;
   createdAt: Date;
 }
+
+// ── Client Portal Types ──
+
+export interface ClientPortalAccess {
+  id: string;
+  customerId: string;
+  userId: string; // Firebase Auth UID
+  email: string;
+  status: 'Active' | 'Suspended';
+  createdAt: Date;
+  updatedAt: Date;
+  createdByUserId: string | null;
+}
+
+export interface ClientRequest {
+  id: string;
+  customerId: string;
+  clientUserId: string; // Firebase Auth UID of the client
+  title: string;
+  description: string;
+  category: 'Design' | 'Development' | 'Support' | 'Marketing' | 'Consulting' | 'Other';
+  status: 'New' | 'In Review' | 'In Progress' | 'Completed' | 'Rejected';
+  priority: 'low' | 'medium' | 'high' | 'urgent';
+  assignedTeamId?: string;
+  assignedToUserId?: string;
+  linkedTaskId?: string;
+  attachmentUrl?: string;
+  adminNotes?: string;
+  createdAt: Date;
+  updatedAt: Date;
+  createdByUserId: string | null;
+}
