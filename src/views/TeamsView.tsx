@@ -81,6 +81,12 @@ const TeamsView: React.FC = () => {
       invitedByUserId: user.uid,
       token,
       expiresAt,
+      canAccessProjects,
+      canAccessTasks,
+      canAccessCRM,
+      canAccessInvoices,
+      canAccessReports,
+      canAccessSettings,
       status: 'Pending',
     });
 
@@ -144,17 +150,17 @@ const TeamsView: React.FC = () => {
   const handleAcceptInvite = async (invite: TeamInvite) => {
     if (!user) return;
 
-    // Create team member
+    // Create team member with permissions from the invite
     await memberMutation.create({
       userId: user.uid,
       teamId: invite.teamId,
       role: invite.role,
-      canAccessProjects: true,
-      canAccessTasks: true,
-      canAccessCRM: false,
-      canAccessInvoices: false,
-      canAccessReports: false,
-      canAccessSettings: false,
+      canAccessProjects: invite.canAccessProjects ?? false,
+      canAccessTasks: invite.canAccessTasks ?? false,
+      canAccessCRM: invite.canAccessCRM ?? false,
+      canAccessInvoices: invite.canAccessInvoices ?? false,
+      canAccessReports: invite.canAccessReports ?? false,
+      canAccessSettings: invite.canAccessSettings ?? false,
       invitedByUserId: invite.invitedByUserId,
       invitedAt: new Date(),
       status: 'Active',

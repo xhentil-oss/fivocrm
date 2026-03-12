@@ -174,6 +174,17 @@ const LoginView: React.FC = () => {
             {isSignUp ? 'Hyr' : 'Regjistrohu'}
           </button>
         </div>
+
+        {/* External Registration */}
+        <div className="text-center text-sm border-t pt-4">
+          <span className="text-muted-foreground">Jeni klient ose i interesuar? </span>
+          <a
+            href="/register"
+            className="text-primary hover:underline font-medium"
+          >
+            Regjistrohu si Lead/Klient
+          </a>
+        </div>
       </Card>
     </div>
   );

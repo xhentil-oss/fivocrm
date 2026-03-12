@@ -5,6 +5,7 @@ import ErrorBoundary from './components/ErrorBoundary';
 import TopNavBar from './components/TopNavBar';
 import Sidebar from './components/Sidebar';
 import LoginView from './views/LoginView';
+import RegisterView from './views/RegisterView';
 import ProjectsView from './views/ProjectsView';
 import ProjectDetailView from './views/ProjectDetailView';
 import CRMView from './views/CRMView';
@@ -66,6 +67,7 @@ function AppContent() {
     <Routes>
       {/* Public route */}
       <Route path="/login" element={user ? <Navigate to="/app/reports" replace /> : <LoginView />} />
+      <Route path="/register" element={<RegisterView />} />
       
       {/* Protected routes */}
       <Route path="/*" element={

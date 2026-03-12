@@ -219,7 +219,16 @@ export interface TeamInvite {
   teamId: string;
   email: string;
   role: string;
-  status: 'Pending' | 'Accepted' | 'Rejected';
+  token?: string;
+  expiresAt?: Date;
+  invitedByUserId?: string;
+  canAccessProjects?: boolean;
+  canAccessTasks?: boolean;
+  canAccessCRM?: boolean;
+  canAccessInvoices?: boolean;
+  canAccessReports?: boolean;
+  canAccessSettings?: boolean;
+  status: 'Pending' | 'Accepted' | 'Rejected' | 'Cancelled';
   createdAt: Date;
   updatedAt: Date;
 }
