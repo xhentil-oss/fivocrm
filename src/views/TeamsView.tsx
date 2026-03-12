@@ -3,6 +3,7 @@ import { useCollection, useMutation } from '../hooks/useFirestore';
 import { useAuth } from '../contexts/AuthContext';
 import { Users, Plus, MoreVertical, Mail, UserPlus, Shield, Trash2, CheckCircle, XCircle, Clock, Edit2, Check, X, Settings, Eye } from 'lucide-react';
 import { usePermissions } from '../hooks/usePermissions';
+import { cn } from '../lib/utils';
 import { Card } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
 import { Button } from '../components/ui/button';
@@ -220,20 +221,22 @@ const TeamsView: React.FC = () => {
             filename="teams"
             columns={['name', 'department']}
           />
-          <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-            <DialogTrigger asChild>
-              <Button className="bg-primary text-primary-foreground">
-                <Plus className="w-4 h-4 mr-2" />
-                Ekip i Ri
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Krijo Ekip të Ri</DialogTitle>
-              </DialogHeader>
-              <TeamForm onSubmit={handleCreateTeam} />
-            </DialogContent>
-          </Dialog>
+          {(permissions.isAdmin || permissions.isOwner) && (
+            <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+              <DialogTrigger asChild>
+                <Button className="bg-primary text-primary-foreground">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Ekip i Ri
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Krijo Ekip të Ri</DialogTitle>
+                </DialogHeader>
+                <TeamForm onSubmit={handleCreateTeam} />
+              </DialogContent>
+            </Dialog>
+          )}
         </div>
       </div>
 
@@ -278,8 +281,11 @@ const TeamsView: React.FC = () => {
                       </div>
                     ) : (
                       <div 
-                        className="cursor-pointer hover:bg-muted/50 px-2 py-1 rounded -ml-2"
-                        onClick={() => startEditing(team.id, 'name', team.name)}
+                        className={cn(
+                          'px-2 py-1 rounded -ml-2',
+                          (permissions.isAdmin || permissions.isOwner) && 'cursor-pointer hover:bg-muted/50'
+                        )}
+                        onClick={() => (permissions.isAdmin || permissions.isOwner) && startEditing(team.id, 'name', team.name)}
                       >
                         <h3 className="text-h4 text-foreground">{team.name}</h3>
                       </div>
@@ -313,8 +319,11 @@ const TeamsView: React.FC = () => {
                     ) : (
                       team.department && (
                         <div 
-                          className="cursor-pointer hover:bg-muted/50 px-2 py-1 rounded -ml-2"
-                          onClick={() => startEditing(team.id, 'department', team.department)}
+                          className={cn(
+                            'px-2 py-1 rounded -ml-2',
+                            (permissions.isAdmin || permissions.isOwner) && 'cursor-pointer hover:bg-muted/50'
+                          )}
+                          onClick={() => (permissions.isAdmin || permissions.isOwner) && startEditing(team.id, 'department', team.department)}
                         >
                           <p className="text-body-sm text-muted-foreground">{team.department}</p>
                         </div>
@@ -336,32 +345,36 @@ const TeamsView: React.FC = () => {
                       <Users className="w-4 h-4 mr-2" />
                       Shiko Anëtarët
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => {
-                      setSelectedTeam(team);
-                      setIsInviteDialogOpen(true);
-                    }}>
-                      <Mail className="w-4 h-4 mr-2" />
-                      Fto me Email
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => {
-                      setSelectedTeam(team);
-                      setIsAddMemberDialogOpen(true);
-                    }}>
-                      <UserPlus className="w-4 h-4 mr-2" />
-                      Shto Anëtar Direkt
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => startEditing(team.id, 'name', team.name)}>
-                      <Edit2 className="w-4 h-4 mr-2" />
-                      Ndrysho Emrin
-                    </DropdownMenuItem>
-                    <DropdownMenuItem className="text-error" onClick={() => {
-                      if (confirm('Je i sigurt që dëshiron të fshish këtë ekip?')) {
-                        teamMutation.remove(team.id);
-                      }
-                    }}>
-                      <Trash2 className="w-4 h-4 mr-2" />
-                      Fshi
-                    </DropdownMenuItem>
+                    {(permissions.isAdmin || permissions.isOwner) && (
+                      <>
+                        <DropdownMenuItem onClick={() => {
+                          setSelectedTeam(team);
+                          setIsInviteDialogOpen(true);
+                        }}>
+                          <Mail className="w-4 h-4 mr-2" />
+                          Fto me Email
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => {
+                          setSelectedTeam(team);
+                          setIsAddMemberDialogOpen(true);
+                        }}>
+                          <UserPlus className="w-4 h-4 mr-2" />
+                          Shto Anëtar Direkt
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => startEditing(team.id, 'name', team.name)}>
+                          <Edit2 className="w-4 h-4 mr-2" />
+                          Ndrysho Emrin
+                        </DropdownMenuItem>
+                        <DropdownMenuItem className="text-error" onClick={() => {
+                          if (confirm('Je i sigurt që dëshiron të fshish këtë ekip?')) {
+                            teamMutation.remove(team.id);
+                          }
+                        }}>
+                          <Trash2 className="w-4 h-4 mr-2" />
+                          Fshi
+                        </DropdownMenuItem>
+                      </>
+                    )}
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
@@ -379,17 +392,19 @@ const TeamsView: React.FC = () => {
                 )}
               </div>
 
-              <Button 
-                variant="outline" 
-                className="w-full"
-                onClick={() => {
-                  setSelectedTeam(team);
-                  setIsInviteDialogOpen(true);
-                }}
-              >
-                <UserPlus className="w-4 h-4 mr-2" />
-                Fto Anëtar
-              </Button>
+              {(permissions.isAdmin || permissions.isOwner) && (
+                <Button 
+                  variant="outline" 
+                  className="w-full"
+                  onClick={() => {
+                    setSelectedTeam(team);
+                    setIsInviteDialogOpen(true);
+                  }}
+                >
+                  <UserPlus className="w-4 h-4 mr-2" />
+                  Fto Anëtar
+                </Button>
+              )}
             </Card>
           );
         })}
@@ -473,7 +488,7 @@ const TeamsView: React.FC = () => {
                       </div>
                     </div>
                     <div className="flex gap-2">
-                      {permissions.isAdmin && (
+                      {(permissions.isAdmin || permissions.isOwner) && (
                         <Button
                           variant="ghost"
                           size="sm"
@@ -485,7 +500,7 @@ const TeamsView: React.FC = () => {
                           <Settings className="w-4 h-4 text-primary" />
                         </Button>
                       )}
-                      {permissions.isAdmin && (
+                      {(permissions.isAdmin || permissions.isOwner) && (
                         <Button
                           variant="ghost"
                           size="sm"
@@ -498,7 +513,7 @@ const TeamsView: React.FC = () => {
                   </div>
                 </Card>
               ))}
-              {!permissions.isAdmin && (
+              {!permissions.isAdmin && !permissions.isOwner && (
                 <p className="text-sm text-muted-foreground text-center py-4">
                   Vetëm administratorët mund të ndryshojnë lejet e anëtarëve
                 </p>
@@ -520,14 +535,16 @@ const TeamsView: React.FC = () => {
                       </p>
                     </div>
                     <div className="flex gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => inviteMutation.update(invite.id, { status: 'Cancelled' })}
-                      >
-                        <XCircle className="w-4 h-4 mr-1" />
-                        Anulo
-                      </Button>
+                      {(permissions.isAdmin || permissions.isOwner) && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => inviteMutation.update(invite.id, { status: 'Cancelled' })}
+                        >
+                          <XCircle className="w-4 h-4 mr-1" />
+                          Anulo
+                        </Button>
+                      )}
                     </div>
                   </div>
                 </Card>

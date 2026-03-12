@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useCollection, useMutation } from '../hooks/useFirestore';
 import { useAuth } from '../contexts/AuthContext';
+import { usePermissions } from '../hooks/usePermissions';
 import { Mail, Phone, Building, DollarSign, TrendingUp, Plus, Calendar as CalendarIcon } from 'lucide-react';
 import { Card } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
@@ -22,6 +23,7 @@ const CRMView: React.FC = () => {
   const [activeTab, setActiveTab] = useState('all');
 
   const { user } = useAuth();
+  const permissions = usePermissions();
   const { data: leads, loading: leadsLoading } = useCollection<Lead>('leads', {
     orderBy: { field: 'createdAt', direction: 'desc' }
   });
@@ -174,20 +176,22 @@ const CRMView: React.FC = () => {
             {leads?.length || 0} total leads · {needsFollowUp.length} need follow-up
           </p>
         </div>
-        <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-          <DialogTrigger asChild>
-            <Button className="bg-primary text-primary-foreground">
-              <Plus className="w-4 h-4 mr-2" />
-              New Lead
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-2xl">
-            <DialogHeader>
-              <DialogTitle>Create New Lead</DialogTitle>
-            </DialogHeader>
-            <LeadForm onSubmit={handleCreateLead} />
-          </DialogContent>
-        </Dialog>
+        {permissions.canEdit && (
+          <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+            <DialogTrigger asChild>
+              <Button className="bg-primary text-primary-foreground">
+                <Plus className="w-4 h-4 mr-2" />
+                New Lead
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl">
+              <DialogHeader>
+                <DialogTitle>Create New Lead</DialogTitle>
+              </DialogHeader>
+              <LeadForm onSubmit={handleCreateLead} />
+            </DialogContent>
+          </Dialog>
+        )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 stagger-children">

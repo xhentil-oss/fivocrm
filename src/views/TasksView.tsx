@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useCollection, useMutation } from '../hooks/useFirestore';
 import { useAuth } from '../contexts/AuthContext';
+import { usePermissions } from '../hooks/usePermissions';
 import { Calendar as CalendarIcon, User, Flag, MoreVertical, Plus, MessageSquare, CalendarDays, Filter, List, LayoutGrid, Users, ChevronRight, ChevronDown, Target, Clock, Play, Pause, Square, Check, X } from 'lucide-react';
 import { Card } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
@@ -25,6 +26,7 @@ import TaskDetailPanel from '../components/TaskDetailPanel';
 
 const TasksView: React.FC = () => {
   const { user } = useAuth();
+  const permissions = usePermissions();
   const [viewMode, setViewMode] = useState<'board' | 'calendar' | 'list'>('list');
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -341,20 +343,22 @@ const TasksView: React.FC = () => {
               </TabsList>
             </Tabs>
 
-            <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-              <DialogTrigger asChild>
-                <Button size="sm" className="bg-primary text-primary-foreground">
-                  <Plus className="w-4 h-4 sm:mr-1" />
-                  <span className="hidden sm:inline">Detyrë e Re</span>
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-                <DialogHeader>
-                  <DialogTitle>Krijo Detyrë të Re</DialogTitle>
-                </DialogHeader>
-                <TaskForm onSubmit={handleCreateTask} projects={projects || []} />
-              </DialogContent>
-            </Dialog>
+            {permissions.canEdit && (
+              <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button size="sm" className="bg-primary text-primary-foreground">
+                    <Plus className="w-4 h-4 sm:mr-1" />
+                    <span className="hidden sm:inline">Detyrë e Re</span>
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle>Krijo Detyrë të Re</DialogTitle>
+                  </DialogHeader>
+                  <TaskForm onSubmit={handleCreateTask} projects={projects || []} />
+                </DialogContent>
+              </Dialog>
+            )}
           </div>
         </div>
 

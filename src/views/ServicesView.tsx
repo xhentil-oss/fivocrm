@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useCollection, useMutation } from '../hooks/useFirestore';
+import { usePermissions } from '../hooks/usePermissions';
 import { ShoppingCart, Plus, DollarSign, Tag, Eye, Edit, Trash2 } from 'lucide-react';
 import { Card } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
@@ -13,6 +14,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs'
 import type { Service } from '../types';
 
 const ServicesView: React.FC = () => {
+  const permissions = usePermissions();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [selectedService, setSelectedService] = useState<Service | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -97,20 +99,22 @@ const ServicesView: React.FC = () => {
             {services?.length || 0} total services
           </p>
         </div>
-        <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-          <DialogTrigger asChild>
-            <Button className="bg-primary text-primary-foreground">
-              <Plus className="w-4 h-4 mr-2" />
-              New Service
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-2xl">
-            <DialogHeader>
-              <DialogTitle>Create New Service</DialogTitle>
-            </DialogHeader>
-            <ServiceForm onSubmit={handleCreateService} />
-          </DialogContent>
-        </Dialog>
+        {permissions.canEdit && (
+          <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+            <DialogTrigger asChild>
+              <Button className="bg-primary text-primary-foreground">
+                <Plus className="w-4 h-4 mr-2" />
+                New Service
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl">
+              <DialogHeader>
+                <DialogTitle>Create New Service</DialogTitle>
+              </DialogHeader>
+              <ServiceForm onSubmit={handleCreateService} />
+            </DialogContent>
+          </Dialog>
+        )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -150,23 +154,27 @@ const ServicesView: React.FC = () => {
                 </div>
               </div>
               <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    setSelectedService(service);
-                    setIsEditDialogOpen(true);
-                  }}
-                >
-                  <Edit className="w-4 h-4" />
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleDeleteService(service.id)}
-                >
-                  <Trash2 className="w-4 h-4" />
-                </Button>
+                {permissions.canEdit && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setSelectedService(service);
+                      setIsEditDialogOpen(true);
+                    }}
+                  >
+                    <Edit className="w-4 h-4" />
+                  </Button>
+                )}
+                {permissions.canEdit && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleDeleteService(service.id)}
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                )}
               </div>
             </div>
           </Card>

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useCollection, useMutation } from '../hooks/useFirestore';
+import { usePermissions } from '../hooks/usePermissions';
 import { DollarSign, Plus, Calendar as CalendarIcon, CreditCard, Mail, Send, Building2, ShoppingCart, Trash2, Eye, Edit2, Check, X, ExternalLink, Loader2 } from 'lucide-react';
 import ExportButton from '../components/ExportButton';
 import { Card } from '../components/ui/card';
@@ -28,6 +29,7 @@ const getStatusColor = (status: string) => {
 };
 
 const InvoicesView: React.FC = () => {
+  const permissions = usePermissions();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
   const [editingInvoiceId, setEditingInvoiceId] = useState<string | null>(null);
@@ -85,6 +87,7 @@ const InvoicesView: React.FC = () => {
   };
 
   const startEditing = (invoiceId: string, field: string, currentValue: any) => {
+    if (!permissions.canEdit) return;
     setEditingInvoiceId(invoiceId);
     setEditingField(field);
     setEditValue(String(currentValue || ''));
@@ -162,20 +165,22 @@ const InvoicesView: React.FC = () => {
             filename="invoices"
             columns={['invoiceNumber', 'customerId', 'total', 'status', 'dueDate', 'paymentMethod']}
           />
-          <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-            <DialogTrigger asChild>
-              <Button className="bg-primary text-primary-foreground">
-                <Plus className="w-4 h-4 mr-2" />
-                Faturë e Re
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle>Krijo Faturë të Re</DialogTitle>
-              </DialogHeader>
-              <InvoiceForm onClose={() => setIsCreateDialogOpen(false)} />
-            </DialogContent>
-          </Dialog>
+          {permissions.canEdit && (
+            <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+              <DialogTrigger asChild>
+                <Button className="bg-primary text-primary-foreground">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Faturë e Re
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle>Krijo Faturë të Re</DialogTitle>
+                </DialogHeader>
+                <InvoiceForm onClose={() => setIsCreateDialogOpen(false)} />
+              </DialogContent>
+            </Dialog>
+          )}
         </div>
       </div>
 
@@ -333,7 +338,7 @@ const InvoicesView: React.FC = () => {
                         >
                           <Eye className="w-4 h-4" />
                         </Button>
-                        {!invoice.emailSent && (
+                        {permissions.canEdit && !invoice.emailSent && (
                           <Button
                             variant="outline"
                             size="sm"
@@ -342,7 +347,7 @@ const InvoicesView: React.FC = () => {
                             <Mail className="w-4 h-4" />
                           </Button>
                         )}
-                        {invoice.status === 'Pending' && !invoice.reminderSent && (
+                        {permissions.canEdit && invoice.status === 'Pending' && !invoice.reminderSent && (
                           <Button
                             variant="outline"
                             size="sm"

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useCollection, useMutation } from '../hooks/useFirestore';
+import { usePermissions } from '../hooks/usePermissions';
 import { DollarSign, Plus, Calendar as CalendarIcon, Building2, Repeat } from 'lucide-react';
 import { Card } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
@@ -15,6 +16,7 @@ import { Switch } from '../components/ui/switch';
 import type { Expense, Team } from '../types';
 
 const ExpensesView: React.FC = () => {
+  const permissions = usePermissions();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [selectedExpense, setSelectedExpense] = useState<Expense | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -128,20 +130,22 @@ const ExpensesView: React.FC = () => {
             {expenses?.length || 0} total expenses · {activeExpenses} active · {recurringExpenses} recurring
           </p>
         </div>
-        <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-          <DialogTrigger asChild>
-            <Button className="bg-primary text-primary-foreground">
-              <Plus className="w-4 h-4 mr-2" />
-              New Expense
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-2xl">
-            <DialogHeader>
-              <DialogTitle>Create New Expense</DialogTitle>
-            </DialogHeader>
-            <ExpenseForm onSubmit={handleCreateExpense} teams={teams || []} />
-          </DialogContent>
-        </Dialog>
+        {permissions.canEdit && (
+          <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+            <DialogTrigger asChild>
+              <Button className="bg-primary text-primary-foreground">
+                <Plus className="w-4 h-4 mr-2" />
+                New Expense
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl">
+              <DialogHeader>
+                <DialogTitle>Create New Expense</DialogTitle>
+              </DialogHeader>
+              <ExpenseForm onSubmit={handleCreateExpense} teams={teams || []} />
+            </DialogContent>
+          </Dialog>
+        )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -260,23 +264,27 @@ const ExpensesView: React.FC = () => {
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex gap-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {
-                            setSelectedExpense(expense);
-                            setIsEditDialogOpen(true);
-                          }}
-                        >
-                          Edit
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleDeleteExpense(expense.id)}
-                        >
-                          Delete
-                        </Button>
+                        {permissions.canEdit && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              setSelectedExpense(expense);
+                              setIsEditDialogOpen(true);
+                            }}
+                          >
+                            Edit
+                          </Button>
+                        )}
+                        {permissions.canEdit && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleDeleteExpense(expense.id)}
+                          >
+                            Delete
+                          </Button>
+                        )}
                       </div>
                     </td>
                   </tr>

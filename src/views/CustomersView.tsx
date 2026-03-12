@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useCollection, useMutation } from '../hooks/useFirestore';
+import { usePermissions } from '../hooks/usePermissions';
 import { Building2, Plus, Mail, Phone, MapPin, Search, Filter, X, CheckCircle2, XCircle, AlertCircle, Star, Users } from 'lucide-react';
 import { Card } from '../components/ui/card';
 import { Button } from '../components/ui/button';
@@ -35,6 +36,7 @@ const INDUSTRY_OPTIONS = [
 ];
 
 const CustomersView: React.FC = () => {
+  const permissions = usePermissions();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -225,20 +227,22 @@ const CustomersView: React.FC = () => {
             {filteredCustomers.length} nga {customers?.length || 0} klientë
           </p>
         </div>
-        <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-          <DialogTrigger asChild>
-            <Button className="bg-primary text-primary-foreground">
-              <Plus className="w-4 h-4 mr-2" />
-              Klient i Ri
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-2xl">
-            <DialogHeader>
-              <DialogTitle>Krijo Klient të Ri</DialogTitle>
-            </DialogHeader>
-            <CustomerForm onSubmit={handleCreateCustomer} />
-          </DialogContent>
-        </Dialog>
+        {permissions.canEdit && (
+          <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+            <DialogTrigger asChild>
+              <Button className="bg-primary text-primary-foreground">
+                <Plus className="w-4 h-4 mr-2" />
+                Klient i Ri
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl">
+              <DialogHeader>
+                <DialogTitle>Krijo Klient të Ri</DialogTitle>
+              </DialogHeader>
+              <CustomerForm onSubmit={handleCreateCustomer} />
+            </DialogContent>
+          </Dialog>
+        )}
       </div>
 
       {/* Status Summary Cards */}
@@ -494,16 +498,18 @@ const CustomersView: React.FC = () => {
                           : '-'}
                       </td>
                       <td className="px-6 py-4">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {
-                            setSelectedCustomer(customer);
-                            setIsEditDialogOpen(true);
-                          }}
-                        >
-                          Ndrysho
-                        </Button>
+                        {permissions.canEdit && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              setSelectedCustomer(customer);
+                              setIsEditDialogOpen(true);
+                            }}
+                          >
+                            Ndrysho
+                          </Button>
+                        )}
                       </td>
                     </tr>
                   );

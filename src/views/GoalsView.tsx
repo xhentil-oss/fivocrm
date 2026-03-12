@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useCollection, useMutation } from '../hooks/useFirestore';
 import { useAuth } from '../contexts/AuthContext';
+import { usePermissions } from '../hooks/usePermissions';
 import { Target, Plus, TrendingUp, AlertCircle, CheckCircle2, Calendar, Users, ChevronRight } from 'lucide-react';
 import { Card } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
@@ -17,6 +18,7 @@ import type { Goal, Team, Milestone } from '../types';
 
 const GoalsView: React.FC = () => {
   const { user } = useAuth();
+  const permissions = usePermissions();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [selectedGoal, setSelectedGoal] = useState<Goal | null>(null);
   const [filterStatus, setFilterStatus] = useState<string>('all');
@@ -133,20 +135,22 @@ const GoalsView: React.FC = () => {
             </SelectContent>
           </Select>
 
-          <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-            <DialogTrigger asChild>
-              <Button className="bg-primary text-primary-foreground">
-                <Plus className="w-4 h-4 mr-2" />
-                New Goal
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-2xl">
-              <DialogHeader>
-                <DialogTitle>Create New Goal</DialogTitle>
-              </DialogHeader>
-              <GoalForm onSubmit={handleCreateGoal} teams={teams || []} />
-            </DialogContent>
-          </Dialog>
+          {permissions.canEdit && (
+            <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+              <DialogTrigger asChild>
+                <Button className="bg-primary text-primary-foreground">
+                  <Plus className="w-4 h-4 mr-2" />
+                  New Goal
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-2xl">
+                <DialogHeader>
+                  <DialogTitle>Create New Goal</DialogTitle>
+                </DialogHeader>
+                <GoalForm onSubmit={handleCreateGoal} teams={teams || []} />
+              </DialogContent>
+            </Dialog>
+          )}
         </div>
       </div>
 

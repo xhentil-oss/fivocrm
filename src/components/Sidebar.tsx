@@ -28,6 +28,7 @@ const allNavItems: NavItem[] = [
   { path: '/app/services', label: 'Shërbimet', icon: Receipt, permissionKey: 'canAccessServices' },
   { path: '/app/invoices', label: 'Faturat', icon: Receipt, permissionKey: 'canAccessInvoices' },
   { path: '/app/expenses', label: 'Shpenzimet', icon: DollarSign, permissionKey: 'canAccessExpenses' },
+  { path: '/app/time-tracking', label: 'Koha', icon: Clock, permissionKey: 'canAccessTimeTracking' },
   { path: '/app/chat', label: 'Chat', icon: MessageSquare, permissionKey: 'canAccessChat' },
   { path: '/app/reports', label: 'Raportet', icon: BarChart3, permissionKey: 'canAccessReports' },
   { path: '/app/profile', label: 'Profili', icon: UserCircle, permissionKey: 'canAccessProfile' },
@@ -38,9 +39,9 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, mobileOpen, onCloseMobile 
   const permissions = usePermissions();
 
   // Filter nav items based on user permissions
-  // While loading, show all items to avoid empty menu
+  // While loading, show only profile to avoid unauthorized flicker
   const navItems = permissions.isLoading 
-    ? allNavItems 
+    ? allNavItems.filter(item => item.permissionKey === 'canAccessProfile')
     : allNavItems.filter(item => {
         const permKey = item.permissionKey as keyof typeof permissions;
         return permissions[permKey] === true;

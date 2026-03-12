@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCollection, useMutation } from '../hooks/useFirestore';
 import { useAuth } from '../contexts/AuthContext';
+import { usePermissions } from '../hooks/usePermissions';
 import { Search, Plus, List, Users, ChevronDown, MoreVertical, Folder, Star, StarOff } from 'lucide-react';
 import { Card } from '../components/ui/card';
 import { Button } from '../components/ui/button';
@@ -24,6 +25,7 @@ import type { Project, Team, TeamMember, Task } from '../types';
 const ProjectsView: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const permissions = usePermissions();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   
@@ -150,20 +152,22 @@ const ProjectsView: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold text-foreground">Shfleto projektet</h1>
-        <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-          <DialogTrigger asChild>
-            <Button className="bg-primary text-primary-foreground">
-              <Plus className="w-4 h-4 mr-2" />
-              Krijo projekt
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Krijo Projekt të Ri</DialogTitle>
-            </DialogHeader>
-            <ProjectForm onSubmit={handleCreateProject} teams={teams || []} />
-          </DialogContent>
-        </Dialog>
+        {permissions.canEdit && (
+          <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+            <DialogTrigger asChild>
+              <Button className="bg-primary text-primary-foreground">
+                <Plus className="w-4 h-4 mr-2" />
+                Krijo projekt
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Krijo Projekt të Ri</DialogTitle>
+              </DialogHeader>
+              <ProjectForm onSubmit={handleCreateProject} teams={teams || []} />
+            </DialogContent>
+          </Dialog>
+        )}
       </div>
 
       {/* Search Bar */}
