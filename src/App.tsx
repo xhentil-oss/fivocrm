@@ -21,9 +21,11 @@ import CustomersView from './views/CustomersView';
 import ServicesView from './views/ServicesView';
 import ExpensesView from './views/ExpensesView';
 import TimeTrackingView from './views/TimeTrackingView';
+import JoinInviteView from './views/JoinInviteView';
 import FloatingActionButton from './components/FloatingActionButton';
 import CommandPalette from './components/CommandPalette';
 import PermissionGate from './components/PermissionGate';
+import PendingInvitesBanner from './components/PendingInvitesBanner';
 import { usePermissions } from './hooks/usePermissions';
 import { Toaster } from './components/ui/toaster';
 import { Loader2 } from 'lucide-react';
@@ -88,6 +90,7 @@ function AppContent() {
       {/* Public route */}
       <Route path="/login" element={user ? <DefaultRedirect /> : <LoginView />} />
       <Route path="/register" element={<RegisterView />} />
+      <Route path="/join/:token" element={<JoinInviteView />} />
       
       {/* Protected routes */}
       <Route path="/*" element={
@@ -114,6 +117,7 @@ function AppContent() {
                 style={{ marginTop: '72px' }}
               >
                 <div className="p-6 lg:p-8">
+                  <PendingInvitesBanner />
                   <ErrorBoundary>
                     <Routes>
                       <Route path="/" element={<DefaultRedirect />} />

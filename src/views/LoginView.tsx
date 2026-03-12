@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
@@ -9,6 +9,12 @@ import { Loader2 } from 'lucide-react';
 
 const LoginView: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const rawRedirect = searchParams.get('redirect');
+  // Only allow internal paths to prevent open redirect
+  const redirectTo = rawRedirect && rawRedirect.startsWith('/') && !rawRedirect.startsWith('//') 
+    ? rawRedirect 
+    : '/app/reports';
   const { signInWithGoogle, signInWithEmail, signUpWithEmail } = useAuth();
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState('');
@@ -21,7 +27,7 @@ const LoginView: React.FC = () => {
     setError(null);
     try {
       await signInWithGoogle();
-      navigate('/app/reports');
+      navigate(redirectTo);
     } catch (err: any) {
       setError(err.message || 'Gabim gjatë hyrjes me Google');
     } finally {
@@ -40,7 +46,7 @@ const LoginView: React.FC = () => {
       } else {
         await signInWithEmail(email, password);
       }
-      navigate('/app/reports');
+      navigate(redirectTo);
     } catch (err: any) {
       // Handle Firebase auth errors
       if (err.code === 'auth/user-not-found') {
