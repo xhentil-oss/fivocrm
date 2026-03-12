@@ -6,7 +6,7 @@ import type { ClientPortalAccess, Customer } from '../types';
 /**
  * Hook that checks if the current authenticated user has client portal access.
  * Auto-links the userId if the user's email matches a portal access record.
- * Auto-creates portal access if a Customer record exists with matching email.
+ * Auto-creates Customer + portal access if user has no records yet.
  */
 export function useClientPortal() {
   const { user, loading: authLoading } = useAuth();
@@ -39,7 +39,7 @@ export function useClientPortal() {
   );
 
   // Check for matching customer (for auto-creating access)
-  const { data: matchingCustomers } = useCollection<Customer>(
+  const { data: matchingCustomers, loading: customersLoading } = useCollection<Customer>(
     'customers',
     user?.email
       ? {
@@ -49,6 +49,7 @@ export function useClientPortal() {
   );
 
   const accessMutation = useMutation<ClientPortalAccess>('clientPortalAccess');
+  const customerMutation = useMutation<Customer>('customers');
 
   // Auto-link: if we found by email but userId is empty, update it
   useEffect(() => {
@@ -61,23 +62,40 @@ export function useClientPortal() {
     }
   }, [user, byUserId, byEmail, byUserIdLoading, byEmailLoading]);
 
-  // Auto-create: if customer exists but no portal access, create one
+  // Auto-create: if customer exists but no portal access, create access
+  // If NO customer exists, create customer + access
   useEffect(() => {
-    if (!user || byUserIdLoading || byEmailLoading || autoCreating) return;
+    if (!user?.email || byUserIdLoading || byEmailLoading || customersLoading || autoCreating) return;
     if (byUserId && byUserId.length > 0) return;
     if (byEmail && byEmail.length > 0) return;
 
     const customer = matchingCustomers?.[0];
-    if (customer && customer.email) {
+    if (customer) {
+      // Customer exists but no portal access — create access
       setAutoCreating(true);
       accessMutation.create({
         customerId: customer.id,
         userId: user.uid,
-        email: customer.email,
+        email: user.email,
         status: 'Active',
       }).catch(() => setAutoCreating(false));
+    } else {
+      // No customer at all — create customer + access
+      setAutoCreating(true);
+      customerMutation.create({
+        name: user.displayName || user.email,
+        email: user.email,
+        status: 'Pending',
+      } as any).then((newCustomer) => {
+        return accessMutation.create({
+          customerId: newCustomer.id,
+          userId: user.uid,
+          email: user.email!,
+          status: 'Active',
+        });
+      }).catch(() => setAutoCreating(false));
     }
-  }, [user, byUserId, byEmail, byUserIdLoading, byEmailLoading, matchingCustomers, autoCreating]);
+  }, [user, byUserId, byEmail, byUserIdLoading, byEmailLoading, matchingCustomers, customersLoading, autoCreating]);
 
   const access = byUserId?.[0] || byEmail?.[0] || null;
 
