@@ -275,6 +275,7 @@ export interface ClientRequest {
   category: 'Design' | 'Development' | 'Support' | 'Marketing' | 'Consulting' | 'Other';
   status: 'New' | 'In Review' | 'In Progress' | 'Completed' | 'Rejected';
   priority: 'low' | 'medium' | 'high' | 'urgent';
+  serviceId?: string;
   assignedTeamId?: string;
   assignedToUserId?: string;
   linkedTaskId?: string;

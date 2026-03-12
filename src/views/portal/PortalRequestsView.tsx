@@ -13,7 +13,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Separator } from '../../components/ui/separator';
 import { ClipboardList, Plus, Clock, CheckCircle2, XCircle, AlertTriangle, Eye } from 'lucide-react';
 import { useToast } from '../../hooks/use-toast';
-import type { ClientRequest, Team } from '../../types';
+import type { ClientRequest, Team, Service } from '../../types';
 
 const CATEGORIES = [
   { value: 'Design', label: 'Dizajn' },
@@ -45,6 +45,7 @@ const PortalRequestsView: React.FC = () => {
   });
 
   const { data: teams } = useCollection<Team>('teams');
+  const { data: services } = useCollection<Service>('services');
 
   const requestMutation = useMutation<ClientRequest>('clientRequests');
 
@@ -114,6 +115,7 @@ const PortalRequestsView: React.FC = () => {
     const description = formData.get('description') as string;
     const category = formData.get('category') as string;
     const priority = formData.get('priority') as string;
+    const serviceId = formData.get('serviceId') as string;
     const attachmentUrl = formData.get('attachmentUrl') as string;
 
     if (!title || !description || !category || !priority || !user || !customerId) return;
@@ -128,6 +130,7 @@ const PortalRequestsView: React.FC = () => {
       category: category as ClientRequest['category'],
       status: 'New',
       priority: priority as ClientRequest['priority'],
+      serviceId: serviceId || undefined,
       assignedTeamId,
       attachmentUrl: attachmentUrl || undefined,
     });
@@ -223,6 +226,23 @@ const PortalRequestsView: React.FC = () => {
                   </SelectContent>
                 </Select>
               </div>
+              {services && services.length > 0 && (
+                <div>
+                  <Label htmlFor="serviceId">Shërbimi</Label>
+                  <Select name="serviceId">
+                    <SelectTrigger>
+                      <SelectValue placeholder="Zgjidhni shërbimin (opsionale)" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {services.map(s => (
+                        <SelectItem key={s.id} value={s.id}>
+                          {s.title || s.name}{s.category ? ` — ${s.category}` : ''}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
               <div>
                 <Label htmlFor="description">Përshkrimi</Label>
                 <Textarea

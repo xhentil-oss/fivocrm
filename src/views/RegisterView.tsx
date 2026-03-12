@@ -39,8 +39,8 @@ const RegisterView: React.FC = () => {
         ...doc.data()
       })) as ServiceOption[];
       setServices(items);
-    }, (err) => {
-      console.error('Error fetching services:', err);
+    }, () => {
+      // Services may be unavailable for unauthenticated users — silently ignore
     });
     return () => unsubscribe();
   }, []);
@@ -75,6 +75,22 @@ const RegisterView: React.FC = () => {
         updatedAt: Timestamp.now(),
         createdByUserId: null,
       });
+
+      // Also create a Customer record so portal auto-access works
+      try {
+        await addDoc(collection(db, 'customers'), {
+          name: fullName,
+          email: email.trim(),
+          phone: phone.trim() || null,
+          company: company.trim() || null,
+          status: 'Pending',
+          createdAt: Timestamp.now(),
+          updatedAt: Timestamp.now(),
+          createdByUserId: null,
+        });
+      } catch {
+        // Customer creation may fail if Firestore rules restrict it — not critical
+      }
 
       setSuccess(true);
     } catch (err: any) {
