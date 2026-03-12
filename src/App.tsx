@@ -21,7 +21,6 @@ import CustomersView from './views/CustomersView';
 import ServicesView from './views/ServicesView';
 import ExpensesView from './views/ExpensesView';
 import TimeTrackingView from './views/TimeTrackingView';
-import ClientPortalManagementView from './views/ClientPortalManagementView';
 import JoinInviteView from './views/JoinInviteView';
 import PortalLayout from './views/portal/PortalLayout';
 import PortalDashboard from './views/portal/PortalDashboard';
@@ -152,7 +151,6 @@ function AppContent() {
                       <Route path="/app/expenses" element={<PermissionGate permissionKey="canAccessExpenses"><ExpensesView /></PermissionGate>} />
                       <Route path="/app/time-tracking" element={<PermissionGate permissionKey="canAccessTimeTracking"><TimeTrackingView /></PermissionGate>} />
                       <Route path="/app/settings" element={<PermissionGate permissionKey="canAccessSettings"><SettingsView /></PermissionGate>} />
-                      <Route path="/app/client-portal" element={<PermissionGate permissionKey="canAccessCRM"><ClientPortalManagementView /></PermissionGate>} />
                       <Route path="*" element={
                       <div className="text-center py-20">
                         <h1 className="text-4xl font-bold text-foreground mb-4">404</h1>
